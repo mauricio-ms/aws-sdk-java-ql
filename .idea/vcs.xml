@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-album" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-audio" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-audiotag" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-comment" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-contract" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-distribution" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-filter" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-follow" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-legacy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-like" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-mail" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-playlist" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-publishing" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-scan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-soundkit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-track" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-tracklist" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/java/projects_tmp/api-wallet" vcs="Git" />
+  </component>
+</project>
