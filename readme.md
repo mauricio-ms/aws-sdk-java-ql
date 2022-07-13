@@ -1,4 +1,1 @@
-cd src/main/java/
-ls -d $PWD/projects_tmp/* | java Main
-
-ls -d ~/development/aws-sdk-java-ql/projects_tmp/* | java Main
+ls -d ~/development/aws-sdk-java-ql/projects_tmp/* | java -cp target/java-ast-generator-1.0-SNAPSHOT-jar-with-dependencies.jar src/main/java/Main.java

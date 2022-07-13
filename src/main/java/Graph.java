@@ -16,6 +16,7 @@ public class Graph {
             adj[i] = new ArrayList<>();
         }
     }
+
     public int v() {
         return v;
     }
@@ -26,7 +27,6 @@ public class Graph {
 
     public void addEdge(int v, int w) {
         adj[v].add(w);
-//        adj[w].add(v);
         e++;
     }
 

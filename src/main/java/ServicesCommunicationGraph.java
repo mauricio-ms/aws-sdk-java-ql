@@ -1,3 +1,6 @@
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,35 @@ public final class ServicesCommunicationGraph {
 
         addService(service);
         return servicesId.get(service);
+    }
+
+    public static JSONObject toJson() {
+        JSONArray nodes = new JSONArray();
+        JSONArray edges = new JSONArray();
+        int edgesCounter = 0;
+        for (int i = 0; i < serviceId; i++) {
+            JSONObject node = new JSONObject();
+            JSONObject nodeData = new JSONObject();
+            nodeData.put("id", String.valueOf(i));
+            nodeData.put("name", services.get(i));
+            node.put("data", nodeData);
+            nodes.put(i, node);
+            for (int w : graph.adj(i)) {
+                JSONObject edge = new JSONObject();
+                JSONObject edgeData = new JSONObject();
+                edgeData.put("source", String.valueOf(i));
+                edgeData.put("target", String.valueOf(w));
+                edge.put("data", edgeData);
+                edges.put(edgesCounter++, edge);
+            }
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        JSONObject elements = new JSONObject();
+        elements.put("nodes", nodes);
+        elements.put("edges", edges);
+        jsonObject.put("elements", elements);
+        return jsonObject;
     }
 
     public static void show() {

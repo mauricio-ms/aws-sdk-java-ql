@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class Main {
@@ -40,11 +41,12 @@ public class Main {
 
         System.out.println("Graph");
         ServicesCommunicationGraph.show();
+//        System.out.println(ServicesCommunicationGraph.toJson());
     }
 
     private static void parse(Node nodeProject, String filePath) {
         try {
-            System.out.println("\t" + filePath);
+//            System.out.println("\t" + filePath);
             var input = new FileInputStream(filePath);
             var chars = CharStreams.fromStream(input);
             var lexer = new JavaLexer(chars);
