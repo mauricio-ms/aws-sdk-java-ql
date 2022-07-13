@@ -14,23 +14,35 @@ public class Main {
     private static final String SRC = "/src/main/java";
 
     public static void main(String[] args) throws IOException {
+        Node tree = new Node(null, null);
         while (!StdIn.isEmpty()) {
             String projectPath = StdIn.readString();
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
+            Node nodeProject = new Node(project, Node.Type.PROJECT);
+            tree.addChild(nodeProject);
             System.out.println("Analyzing project " + project);
             String projectFilesPath = projectPath + SRC;
             try (Stream<Path> pathStream = Files.walk(Paths.get(projectFilesPath))) {
                 pathStream
                         .filter(Files::isRegularFile)
-                        .forEach(path -> parse(project, path.toString()));
+                        .forEach(path -> parse(nodeProject, path.toString()));
             }
         }
-//        parse("api-contract", "/home/mauricio/development/beatstars/api-contract/src/main/java/com/beatstars/contract/service/ContractAttachmentServiceImpl.java");
+
+//        Node nodeProject = new Node("api-audiotag", Node.Type.PROJECT);
+//        tree.addChild(nodeProject);
+//        parse(nodeProject, "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/src/main/java/com/beatstars/audiotag/data/model/Language.java");
+
+        System.out.println("Tree");
+        tree.show();
+        tree.walk(new TreeListener());
+
+        System.out.println("Graph");
         ServicesCommunicationGraph.show();
     }
 
-    private static void parse(String project, String filePath) {
+    private static void parse(Node nodeProject, String filePath) {
         try {
             System.out.println("\t" + filePath);
             var input = new FileInputStream(filePath);
@@ -40,7 +52,7 @@ public class Main {
             var parser = new JavaParser(tokens);
             parser.setBuildParseTree(true);
             var tree = parser.compilationUnit().getRuleContext();
-            var listener = new CustomJavaParserListener(project);
+            var listener = new CustomJavaParserListener(nodeProject);
             ParseTreeWalker.DEFAULT.walk(listener, tree);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="java-ast-generator" target="15" />
+      <module name="java-ast-generator" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>
