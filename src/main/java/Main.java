@@ -1,13 +1,16 @@
+import graph.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import javaparser.CustomJavaParserListener;
+import javaparser.JavaLexer;
+import javaparser.JavaParser;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class Main {
@@ -31,7 +34,7 @@ public class Main {
             }
         }
 
-//        Node nodeProject = new Node("api-audiotag", Node.Type.PROJECT);
+//        graph.Node nodeProject = new graph.Node("api-audiotag", graph.Node.Type.PROJECT);
 //        tree.addChild(nodeProject);
 //        parse(nodeProject, "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/src/main/java/com/beatstars/audiotag/data/model/Language.java");
 
@@ -39,9 +42,9 @@ public class Main {
         tree.show();
         tree.walk(new TreeListener());
 
-        System.out.println("Graph");
+        System.out.println("graph.Graph");
         ServicesCommunicationGraph.show();
-//        System.out.println(ServicesCommunicationGraph.toJson());
+//        System.out.println(graph.ServicesCommunicationGraph.toJson());
     }
 
     private static void parse(Node nodeProject, String filePath) {

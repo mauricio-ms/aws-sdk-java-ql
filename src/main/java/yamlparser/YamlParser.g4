@@ -3,7 +3,7 @@ parser grammar YamlParser;
 
 options {   tokenVocab = YamlLexer; }
 
-// The Yaml Language Reference: http://www.yaml.org/spec/1.2/spec.html
+// The Yaml Language Reference: http://www.yamlparser.org/spec/1.2/spec.html
 
 /*
  * my parser rules

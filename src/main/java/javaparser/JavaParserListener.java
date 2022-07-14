@@ -1,4 +1,7 @@
+package javaparser;
+
 // Generated from JavaParser.g4 by ANTLR 4.10.1
+
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

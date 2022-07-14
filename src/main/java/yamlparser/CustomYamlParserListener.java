@@ -1,4 +1,4 @@
-package yaml;
+package yamlparser;
 
 public class CustomYamlParserListener extends YamlParserBaseListener {
 

@@ -1,3 +1,5 @@
+package graph;
+
 public class MethodCallNodeValue {
 
     public final String caller;

@@ -1,3 +1,5 @@
+package graph;
+
 import java.util.function.Consumer;
 
 public class TreeListener implements Consumer<Node> {
@@ -44,7 +46,8 @@ public class TreeListener implements Consumer<Node> {
         boolean isParameter = resource.startsWith("${") && resource.endsWith("}");
         if (isParameter) {
             try {
-                return GetAwsParameter.get("/config/application_dev/" + resource.substring(2, resource.length()-1));
+                // TODO disabled temporarily
+//                return GetAwsParameter.get("/config/application_dev/" + resource.substring(2, resource.length()-1));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }

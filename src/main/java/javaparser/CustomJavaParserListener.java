@@ -1,3 +1,8 @@
+package javaparser;
+
+import graph.MethodCallNodeValue;
+import graph.Node;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +55,7 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
                 switch (annotation.qualifiedName().getText()) {
                     case "Value" -> snsVariableToTopicMap.put(ctx.fieldDeclaration().variableDeclarators().getText(), requireAnnotationValue(annotation));
                     case "SqsListener" -> classNode.addChild(new Node(requireAnnotationValue(annotation), Node.Type.SQS_LISTENER));
-//                    case "SqsListener" -> ServicesCommunicationGraph.add(requireAnnotationValue(annotation), nodeProject.value.toString());
+//                    case "SqsListener" -> graph.ServicesCommunicationGraph.add(requireAnnotationValue(annotation), nodeProject.value.toString());
                 }
             }
         }
@@ -135,7 +140,7 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
         if (snsTopic == null) {
 //            throw new RuntimeException("Unknown 'NotificationMessageTemplate' API utilization. Check for updates javadoc.io.");
         } else {
-//            ServicesCommunicationGraph.add(nodeProject.value.toString(), snsTopic);
+//            graph.ServicesCommunicationGraph.add(nodeProject.value.toString(), snsTopic);
         }
     }
 
