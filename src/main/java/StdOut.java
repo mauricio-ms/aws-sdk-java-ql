@@ -19,4 +19,8 @@ public final class StdOut {
     public static void println(Object x) {
         out.println(x);
     }
+
+    public static void println(String format, Object ... args) {
+        out.printf(format, args);
+    }
 }

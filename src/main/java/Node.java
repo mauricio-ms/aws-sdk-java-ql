@@ -133,9 +133,9 @@ public class Node {
 
     private void showRec(Node node, String tabs) {
         if (node.value == null && node.type == null) {
-            System.out.println("root");
+            StdOut.println("root");
         } else if (node.value != null) {
-            System.out.printf("%s%s %s\n", tabs, node.type, node.value);
+            StdOut.println("%s%s %s\n", tabs, node.type, node.value);
         }
 
         for (Node child : node.children) {

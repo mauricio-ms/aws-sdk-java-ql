@@ -35,7 +35,7 @@ public class Main {
 //        tree.addChild(nodeProject);
 //        parse(nodeProject, "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/src/main/java/com/beatstars/audiotag/data/model/Language.java");
 
-        System.out.println("Tree");
+        StdOut.println("Tree");
         tree.show();
         tree.walk(new TreeListener());
 
