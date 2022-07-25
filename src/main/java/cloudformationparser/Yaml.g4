@@ -150,7 +150,7 @@ key
  ;
 
 value
- : NAME | number | STRING_MY
+ : NAME | number | STRING_MY | STRING_LITERAL
  ;
 
 mapping

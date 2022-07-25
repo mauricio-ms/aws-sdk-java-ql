@@ -1,6 +1,5 @@
 // Generated from Yaml.g4 by ANTLR 4.10.1
 package cloudformationparser;
-
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
