@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Audio Tag stack template"
+Parameters:
+  Version:
+    Type: String
+    Default: '4.0.0'
+  Priority:
+    Type: Number
+    Default: 1903
