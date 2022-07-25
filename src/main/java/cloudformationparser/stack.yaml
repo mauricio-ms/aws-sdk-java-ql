@@ -1,9 +1,22 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Audio Tag stack template"
 Parameters:
+  Env:
+    Type: String
+    AllowedValues:
+      - local
+      - dev
+      - stage
+      - prod
   Version:
     Type: String
     Default: '4.0.0'
   Priority:
     Type: Number
     Default: 1903
+  Service:
+    Type: String
+    Default: 'audiotag'
+  VpcId:
+    Type: String
+    Default: 'vpc-0c0e5846b5f2992b5'
