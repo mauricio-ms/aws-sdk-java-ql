@@ -180,12 +180,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitStatement(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitStatement(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -253,12 +250,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_file; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFile(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFile(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFile(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -335,12 +329,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_object; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterObject(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitObject(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitObject(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -401,12 +392,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_objectbody; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterObjectbody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitObjectbody(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitObjectbody(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -457,12 +445,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_file2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFile2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFile2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFile2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -519,12 +504,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_list; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterList(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitList(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitList(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -604,12 +586,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_listitem; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterListitem(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitListitem(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitListitem(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -694,12 +673,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_mappinglist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterMappinglist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitMappinglist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitMappinglist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -792,12 +768,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_key; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterKey(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitKey(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitKey(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -843,12 +816,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_value; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterValue(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitValue(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitValue(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -920,12 +890,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_mapping; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterMapping(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitMapping(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitMapping(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -967,12 +934,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_single_input; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSingle_input(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSingle_input(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSingle_input(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1078,12 +1042,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_file_input; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFile_input(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFile_input(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFile_input(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1192,12 +1153,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_eval_input; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterEval_input(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitEval_input(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitEval_input(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1255,12 +1213,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_decorator; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDecorator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDecorator(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDecorator(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1324,12 +1279,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_decorators; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDecorators(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDecorators(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDecorators(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1382,12 +1334,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_decorated; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDecorated(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDecorated(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDecorated(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1449,12 +1398,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_funcdef; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFuncdef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFuncdef(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFuncdef(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1511,12 +1457,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_parameters; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterParameters(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitParameters(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitParameters(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1582,12 +1525,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_typedargslist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTypedargslist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTypedargslist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTypedargslist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1831,12 +1771,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_tfpdef; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTfpdef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTfpdef(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTfpdef(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1902,12 +1839,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_varargslist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterVarargslist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitVarargslist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitVarargslist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2147,12 +2081,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_vfpdef; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterVfpdef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitVfpdef(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitVfpdef(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2189,12 +2120,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitStmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitStmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2291,12 +2219,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_simple_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSimple_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSimple_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSimple_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2383,12 +2308,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_small_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSmall_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSmall_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSmall_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2524,12 +2446,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_expr_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterExpr_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitExpr_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitExpr_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2699,12 +2618,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_testlist_star_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTestlist_star_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTestlist_star_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTestlist_star_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2806,12 +2722,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_augassign; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterAugassign(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitAugassign(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitAugassign(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2855,12 +2768,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_del_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDel_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDel_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDel_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2894,12 +2804,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_pass_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterPass_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitPass_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitPass_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2945,12 +2852,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_flow_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFlow_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFlow_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFlow_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3018,12 +2922,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_break_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterBreak_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitBreak_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitBreak_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3055,12 +2956,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_continue_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterContinue_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitContinue_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitContinue_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3095,12 +2993,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_return_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterReturn_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitReturn_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitReturn_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3145,12 +3040,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_yield_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterYield_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitYield_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitYield_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3189,12 +3081,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_raise_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterRaise_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitRaise_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitRaise_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3254,12 +3143,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_import_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterImport_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitImport_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitImport_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3309,12 +3195,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_import_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterImport_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitImport_name(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitImport_name(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3366,12 +3249,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_import_from; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterImport_from(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitImport_from(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitImport_from(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3496,12 +3376,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_import_as_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterImport_as_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitImport_as_name(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitImport_as_name(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3550,12 +3427,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_dotted_as_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDotted_as_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDotted_as_name(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDotted_as_name(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3609,12 +3483,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_import_as_names; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterImport_as_names(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitImport_as_names(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitImport_as_names(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3685,12 +3556,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_dotted_as_names; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDotted_as_names(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDotted_as_names(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDotted_as_names(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3746,12 +3614,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_dotted_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDotted_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDotted_name(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDotted_name(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3808,12 +3673,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_global_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterGlobal_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitGlobal_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitGlobal_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3872,12 +3734,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_nonlocal_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterNonlocal_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitNonlocal_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitNonlocal_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3935,12 +3794,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_assert_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterAssert_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitAssert_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitAssert_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4010,12 +3866,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_compound_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterCompound_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitCompound_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitCompound_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4125,12 +3978,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_if_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterIf_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitIf_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitIf_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4217,12 +4067,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_while_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterWhile_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitWhile_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitWhile_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4293,12 +4140,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_for_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFor_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFor_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFor_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4373,12 +4217,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_try_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTry_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTry_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTry_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4495,12 +4336,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_with_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterWith_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitWith_stmt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitWith_stmt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4561,12 +4399,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_with_item; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterWith_item(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitWith_item(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitWith_item(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4616,12 +4451,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_except_clause; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterExcept_clause(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitExcept_clause(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitExcept_clause(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4687,12 +4519,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_suite; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSuite(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSuite(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSuite(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4804,12 +4633,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_test; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTest(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTest(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTest(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4898,12 +4724,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_test_nocond; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTest_nocond(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTest_nocond(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTest_nocond(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4977,12 +4800,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_lambdef; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterLambdef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitLambdef(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitLambdef(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5036,12 +4856,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_lambdef_nocond; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterLambdef_nocond(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitLambdef_nocond(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitLambdef_nocond(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5097,12 +4914,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_or_test; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterOr_test(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitOr_test(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitOr_test(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5160,12 +4974,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_and_test; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterAnd_test(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitAnd_test(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitAnd_test(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5220,12 +5031,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_not_test; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterNot_test(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitNot_test(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitNot_test(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5304,12 +5112,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comparison; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterComparison(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitComparison(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitComparison(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5367,12 +5172,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comp_op; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterComp_op(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitComp_op(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitComp_op(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5487,12 +5289,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_star_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterStar_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitStar_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitStar_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5544,12 +5343,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5607,12 +5403,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_xor_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterXor_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitXor_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitXor_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5670,12 +5463,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_and_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterAnd_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitAnd_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitAnd_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5737,12 +5527,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_shift_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterShift_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitShift_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitShift_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5820,12 +5607,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_arith_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterArith_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitArith_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitArith_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -5915,12 +5699,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_term; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTerm(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTerm(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTerm(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6017,12 +5798,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_factor; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterFactor(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitFactor(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitFactor(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6116,12 +5894,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_power; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterPower(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitPower(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitPower(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6208,12 +5983,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_atom; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterAtom(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitAtom(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitAtom(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6414,12 +6186,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_testlist_comp; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTestlist_comp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTestlist_comp(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTestlist_comp(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6510,12 +6279,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_trailer; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTrailer(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTrailer(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTrailer(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6597,12 +6363,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_subscriptlist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSubscriptlist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSubscriptlist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSubscriptlist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6673,12 +6436,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_subscript; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSubscript(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSubscript(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSubscript(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6757,12 +6517,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_sliceop; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterSliceop(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitSliceop(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitSliceop(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6814,12 +6571,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_exprlist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterExprlist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitExprlist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitExprlist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6890,12 +6644,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_testlist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterTestlist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitTestlist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitTestlist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -6973,12 +6724,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_dictorsetmaker; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterDictorsetmaker(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitDictorsetmaker(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitDictorsetmaker(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7133,12 +6881,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_classdef; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterClassdef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitClassdef(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitClassdef(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7216,12 +6961,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_arglist; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterArglist(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitArglist(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitArglist(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7348,12 +7090,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_argument; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterArgument(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitArgument(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitArgument(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7418,12 +7157,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comp_iter; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterComp_iter(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitComp_iter(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitComp_iter(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7480,12 +7216,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comp_for; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterComp_for(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitComp_for(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitComp_for(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7540,12 +7273,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comp_if; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterComp_if(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitComp_if(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitComp_if(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7593,12 +7323,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_yield_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterYield_expr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitYield_expr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitYield_expr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7647,12 +7374,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_yield_arg; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterYield_arg(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitYield_arg(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitYield_arg(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7723,12 +7447,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_string; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterString(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitString(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitString(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7773,12 +7494,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_number; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterNumber(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitNumber(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitNumber(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -7838,12 +7556,9 @@ public class YamlParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_integer; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).enterInteger(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof YamlListener ) ((YamlListener)listener).exitInteger(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof YamlVisitor ) return ((YamlVisitor<? extends T>)visitor).visitInteger(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 

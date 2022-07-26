@@ -20,3 +20,12 @@ Parameters:
   VpcId:
     Type: String
     Default: 'vpc-0c0e5846b5f2992b5'
+Resources:
+  AudioClient:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join [ '', [ "https://bts-deployments.s3.amazonaws.com/cloudformation/audio/", !Ref Env, "/client.yaml" ] ]
+      Parameters:
+        Env: !Ref Env
+        Service: !Ref Service
+        Prefix: 'TG'

@@ -5,5 +5,5 @@ antlr4 -Dlanguage=Java JavaLexer.g4
 antlr4 -Dlanguage=Java JavaParser.g4
 
 # Generating the Yaml Lexer and Parser
-antlr4 -Dlanguage=Java YamlLexer.g4
-antlr4 -Dlanguage=Java YamlParser.g4
+cd src/main/java/cloudformationparser
+antlr4 -no-listener -visitor -package cloudformationparser Yaml.g4

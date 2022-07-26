@@ -1,9 +1,7 @@
 package cloudformationparser;
 
-import graph.Node;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,9 +19,12 @@ public class CloudFormationTreeGeneratorTool {
             var parser = new YamlParser(tokens);
             parser.setBuildParseTree(true);
             var tree = parser.file().getRuleContext();
-            var cloudFormationTreeGenerator = new CloudFormationTreeGenerator(new Node("api-audiotag", Node.Type.PROJECT));
-            ParseTreeWalker.DEFAULT.walk(cloudFormationTreeGenerator, tree);
-            System.out.println(cloudFormationTreeGenerator);
+//            var cloudFormationTreeGenerator = new CloudFormationTreeGenerator(new Node("api-audiotag", Node.Type.PROJECT));
+            var cloudFormationTreeGeneratorVisitor = new CloudFormationTreeGenerator();
+            cloudFormationTreeGeneratorVisitor.visit(tree);
+//            ParseTreeWalker.DEFAULT.walk(cloudFormationTreeGeneratorVisitor, tree);
+//            System.out.println(cloudFormationTreeGenerator);
+            System.out.println(cloudFormationTreeGeneratorVisitor);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
