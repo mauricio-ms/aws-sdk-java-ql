@@ -137,7 +137,7 @@ list
  ;
 
 listitem
- : MINUS (NAME | STRING_MY)
+ : MINUS NAME
  | MINUS NEWLINE+ INDENT list DEDENT
  ;
 
@@ -146,11 +146,24 @@ mappinglist
  ;
 
 key
- : NAME | STRING_MY
+ : NAME
  ;
 
 value
- : NAME | number | STRING_MY | STRING_LITERAL
+ : NAME | number | STRING_LITERAL | tagArray | array | parameter
+ ;
+
+tagArray
+ : '!' NAME array
+ ;
+
+parameter
+ : '!Ref' NAME
+ ;
+
+array
+ : '[' value (',' value)* ']'
+ | '[' ']'
  ;
 
 mapping
@@ -894,14 +907,6 @@ RIGHT_SHIFT_ASSIGN : '>>=';
 POWER_ASSIGN : '**=';
 IDIV_ASSIGN : '//=';
 
-STRING_MY
- : STRING_MY_START (~(' '|'\r'|'\n'|'"'|':') | (':' ~[ \r\n]) | (' '+ ~[ :\r\n]) )*
- ;
-
-fragment STRING_MY_START
- : ~('-'|' '|'\r'|'\n'|'"'|':') | (':' ~[ \r\n]) | ('-' ~[ \r\n])
- ;
-
 SKIP1
  : ( SPACES | COMMENT | LINE_JOINING ) -> skip
  ;
@@ -1589,4 +1594,5 @@ fragment ID_CONTINUE
  | [\uFE4D-\uFE4F]
  | [\uFF10-\uFF19]
  | '\uFF3F'
+ | '\u003A' '\u003A'
  ;

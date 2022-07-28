@@ -71,6 +71,24 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValue(YamlParser.ValueContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#tagArray}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTagArray(YamlParser.TagArrayContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#parameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameter(YamlParser.ParameterContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#array}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArray(YamlParser.ArrayContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#mapping}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
