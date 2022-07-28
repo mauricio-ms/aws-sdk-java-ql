@@ -109,7 +109,11 @@ tokens { INDENT, DEDENT }
  */
 
 statement
- : (NEWLINE | mapping | object)
+ : (NEWLINE | tagList | mapping | object)
+ ;
+
+tagList
+ : key COLONMAP '!' NAME NEWLINE INDENT list DEDENT
  ;
 
 file
@@ -137,8 +141,8 @@ list
  ;
 
 listitem
- : MINUS NAME
- | MINUS NEWLINE+ INDENT list DEDENT
+ : MINUS value
+ | MINUS MINUS value NEWLINE INDENT list DEDENT
  ;
 
 mappinglist
@@ -157,13 +161,13 @@ tagArray
  : '!' NAME array
  ;
 
-parameter
- : '!Ref' NAME
- ;
-
 array
  : '[' value (',' value)* ']'
  | '[' ']'
+ ;
+
+parameter
+ : '!Ref' NAME
  ;
 
 mapping

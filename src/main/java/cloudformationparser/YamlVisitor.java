@@ -17,6 +17,12 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(YamlParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#tagList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTagList(YamlParser.TagListContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#file}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -77,17 +83,17 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTagArray(YamlParser.TagArrayContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link YamlParser#parameter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParameter(YamlParser.ParameterContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link YamlParser#array}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitArray(YamlParser.ArrayContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#parameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameter(YamlParser.ParameterContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link YamlParser#mapping}.
 	 * @param ctx the parse tree
