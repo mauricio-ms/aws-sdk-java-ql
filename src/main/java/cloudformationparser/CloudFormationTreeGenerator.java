@@ -14,6 +14,7 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
     public CloudFormationTreeGenerator() {
         resourcesTable = new HashMap<>();
     }
+
     @Override
     public Object visitObject(YamlParser.ObjectContext ctx) {
         switch (ctx.key().getText()) {
@@ -104,17 +105,33 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
     private String parseTagArray(YamlParser.TagArrayContext ctx) {
         String tag = ctx.NAME().getText();
         if ("Join".equals(tag)) {
-            return parseArray(ctx.array());
+            var array = ctx.array();
+            return parseArray(parseValue(array.value(0)), array.value(1).array());
         }
         throw new RuntimeException("Unknown tag: " + tag);
     }
 
+    // TODO can be avoided
     private String parseArray(YamlParser.ArrayContext ctx) {
+        return parseArray("", ctx);
+    }
+
+    private String parseArray(String separator, YamlParser.ArrayContext ctx) {
+        var values = ctx.value();
+        if (values.isEmpty()) {
+            return "";
+        } else if (values.size() == 1) {
+            return parseValue(values.get(0));
+        }
+
         StringBuilder parsed = new StringBuilder();
-        for (var value : ctx.value()) {
+        parsed.append(parseValue(values.get(0)));
+        for (int i = 1; i < values.size(); i++) {
+            parsed.append(separator);
+            var value = values.get(i);
             var array = value.array();
             if (array != null) {
-                parsed.append(parseArray(array));
+                parsed.append(parseArray(separator, array));
             } else {
                 parsed.append(parseValue(value));
             }
