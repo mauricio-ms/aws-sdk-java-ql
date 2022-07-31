@@ -114,6 +114,7 @@ statement
 
 tagList
  : key COLONMAP '!' NAME NEWLINE INDENT list DEDENT
+ | key COLON NEWLINE INDENT '!' NAME list DEDENT
  ;
 
 simpleList

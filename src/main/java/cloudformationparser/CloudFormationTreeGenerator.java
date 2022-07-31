@@ -37,7 +37,9 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
                             for (var propertyStatement : propertyObject.objectbody().statement()) {
                                 if (propertyStatement.mapping() != null) {
                                     var mappingEntry = parseMapping(propertyStatement.mapping());
-                                    resourcesTable.get(resourceKey).put(mappingEntry.getKey(), mappingEntry.getValue());
+                                    if (mappingEntry != null) {
+                                        resourcesTable.get(resourceKey).put(mappingEntry.getKey(), mappingEntry.getValue());
+                                    }
                                 } else if (propertyStatement.object() != null) {
                                     if ("Parameters".equals(propertyStatement.object().key().getText())) {
                                         resourcesTable.get(resourceKey).putAll(parseObject(propertyStatement.object()));
@@ -54,7 +56,11 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
     }
 
     private Map.Entry<String, String> parseMapping(YamlParser.MappingContext ctx) {
-        return Map.entry(ctx.key().getText(), parseValue(ctx.value()));
+        String value = parseValue(ctx.value());
+        if (value == null) {
+            return null;
+        }
+        return Map.entry(ctx.key().getText(), value);
     }
 
     private Map<String, Map<String, Object>> parseObject(YamlParser.ObjectContext ctx) {
@@ -108,7 +114,7 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
             var array = ctx.array();
             return parseArray(parseValue(array.value(0)), array.value(1).array());
         }
-        throw new RuntimeException("Unknown tag: " + tag);
+        return null;
     }
 
     // TODO can be avoided
@@ -142,7 +148,7 @@ public class CloudFormationTreeGenerator extends YamlBaseVisitor {
     private String parseParameter(YamlParser.ParameterContext ctx) {
         String name = ctx.NAME().getText();
         if (!parametersTable.containsKey(name)) {
-            throw new RuntimeException("Parameter '" + name + "' not declared.");
+            return null;
         }
         Map<String, Object> parameter = parametersTable.get(name);
         return (String) parameter.getOrDefault("Value", parameter.get("Default"));
