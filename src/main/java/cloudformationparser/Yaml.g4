@@ -109,11 +109,15 @@ tokens { INDENT, DEDENT }
  */
 
 statement
- : (NEWLINE | tagList | mapping | object)
+ : (NEWLINE | tagList | simpleList | mapping | object)
  ;
 
 tagList
  : key COLONMAP '!' NAME NEWLINE INDENT list DEDENT
+ ;
+
+simpleList
+ : key COLON NEWLINE INDENT list DEDENT
  ;
 
 file
@@ -141,8 +145,19 @@ list
  ;
 
 listitem
- : MINUS value
- | MINUS MINUS value NEWLINE INDENT list DEDENT
+ : MINUS listitemvalue (NEWLINE INDENT listitemvaluerest DEDENT)?
+ ;
+
+listitemvaluerest
+ :  (listitemvalue NEWLINE?)*
+ ;
+
+listitemvalue
+ : mapping
+ | object
+ | value
+ | list
+ | NEWLINE
  ;
 
 mappinglist
@@ -154,7 +169,19 @@ key
  ;
 
 value
- : NAME | number | STRING_LITERAL | tagArray | array | parameter
+ : boolean | NAME | number | STRING_LITERAL | tagArray | array | parameter | attributeGetter
+ ;
+
+attributeGetter
+ : '!GetAtt' attribute
+ ;
+
+attribute
+ : NAME ('.' NAME)*
+ ;
+
+boolean
+ : 'True' | 'False'
  ;
 
 tagArray

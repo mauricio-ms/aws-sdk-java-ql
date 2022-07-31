@@ -23,6 +23,12 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTagList(YamlParser.TagListContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#simpleList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSimpleList(YamlParser.SimpleListContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#file}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -59,6 +65,18 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitListitem(YamlParser.ListitemContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#listitemvaluerest}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListitemvaluerest(YamlParser.ListitemvaluerestContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#listitemvalue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListitemvalue(YamlParser.ListitemvalueContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#mappinglist}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -76,6 +94,24 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitValue(YamlParser.ValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#attributeGetter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttributeGetter(YamlParser.AttributeGetterContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#attribute}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttribute(YamlParser.AttributeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBoolean(YamlParser.BooleanContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link YamlParser#tagArray}.
 	 * @param ctx the parse tree

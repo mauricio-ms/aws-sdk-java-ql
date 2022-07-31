@@ -10,12 +10,12 @@ import java.io.IOException;
 public class CloudFormationTreeGeneratorTool {
 
     public static void main(String[] args) {
-//        while (!StdIn.isEmpty()) {
-//            String projectPath = StdIn.readString();
-//            parse(projectPath + "/infrastructure/stack.yaml");
-//        }
-        String filePath = "/home/mauricio/development/aws-sdk-java-ql/java-ast-generator/src/main/java/cloudformationparser/stack.yaml";
-        parse(filePath);
+        while (!StdIn.isEmpty()) {
+            String projectPath = StdIn.readString();
+            parse(projectPath + "/infrastructure/stack.yaml");
+        }
+//        String filePath = "/home/mauricio/development/aws-sdk-java-ql/java-ast-generator/src/main/java/cloudformationparser/stack.yaml";
+//        parse(filePath);
     }
 
     private static void parse(String filePath) {
