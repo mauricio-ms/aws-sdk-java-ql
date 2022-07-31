@@ -158,7 +158,12 @@ listitemvalue
  | object
  | value
  | list
+ | action
  | NEWLINE
+ ;
+
+action
+ : key COLON NAME
  ;
 
 mappinglist
@@ -166,7 +171,8 @@ mappinglist
  ;
 
 key
- : NAME
+ : NAME COLON NAME
+ | NAME
  ;
 
 value
