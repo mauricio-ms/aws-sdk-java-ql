@@ -1,7 +1,11 @@
 package cloudformationparser;
 
+import graph.Graph;
+import graph.GraphToJson;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.json.JSONObject;
+import services.ServicesSymbolTable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +17,7 @@ public class CloudFormationTreeGeneratorTool {
 //            String projectPath = StdIn.readString();
 //            parse(projectPath + "/infrastructure/stack.yaml");
 //        }
+        ServicesSymbolTable.setCurrent("api-audio");
         String filePath = "/home/mauricio/development/aws-sdk-java-ql/java-ast-generator/src/main/java/cloudformationparser/stack.yaml";
         parse(filePath);
     }
@@ -30,6 +35,23 @@ public class CloudFormationTreeGeneratorTool {
             var cloudFormationTreeGeneratorVisitor = new CloudFormationTemplateToSymbolsTable();
             cloudFormationTreeGeneratorVisitor.visit(tree);
             System.out.println(cloudFormationTreeGeneratorVisitor);
+
+            for (var sqsQueueEntry : cloudFormationTreeGeneratorVisitor.getSqsQueuesTable().entrySet()) {
+                ServicesSymbolTable.add((String) sqsQueueEntry.getValue().parameters().get("QueueName"));
+            }
+
+            for (var snsTopicEntry : cloudFormationTreeGeneratorVisitor.getSnsTopicsTable().entrySet()) {
+                ServicesSymbolTable.add((String) snsTopicEntry.getValue().parameters().get("TopicName"));
+            }
+
+            ServicesSymbolTable.print();
+
+            Graph cloudFormationGraph = new CloudFormationGraphGenerator(
+                    cloudFormationTreeGeneratorVisitor.getSqsQueuesTable(),
+                    cloudFormationTreeGeneratorVisitor.getSnsTopicsTable())
+                    .generate();
+            JSONObject jsonObject = new GraphToJson(cloudFormationGraph).build();
+            System.out.println(jsonObject);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

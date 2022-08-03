@@ -1,0 +1,110 @@
+
+<!-- saved from url=(0062)https://ivis-at-bilkent.github.io/cytoscape.js-avsdf/demo.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<style id="__________cytoscape_stylesheet">.__________cytoscape_container { position: relative; }</style><title>cytoscape-avsdf.js demo</title>
+
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+		<script src="./graph-viewer-assets/cytoscape.min.js"></script>
+
+		<!--polyfills are needed for this extension for old browsers like IE -->
+		<script src="./graph-viewer-assets/shim.min.js"></script>
+
+		<script src="./graph-viewer-assets/layout-base.js"></script>
+		<script src="./graph-viewer-assets/avsdf-base.js"></script>
+		<script src="./graph-viewer-assets/cytoscape-avsdf.js"></script>
+
+		<script src="./graph-data.js"></script>
+
+		<style>
+			body {
+				font-family: helvetica;
+				font-size: 15px;
+			}
+
+			#cy {
+				width: 100%;
+				height: 90%;
+				z-index: 999;
+			}
+
+			h1 {
+				opacity: 0.5;
+				font-size: 1em;
+				font-weight: bold;
+			}
+
+			button {
+				font-size: 15px;
+				margin-right: 10px;
+			}
+
+			.line {
+				clear:left;
+				height:25px;
+				margin-top:6px;
+				margin-right:6px;
+				margin-bottom:6px;
+			}
+
+			.radio {
+				margin-left:25px;
+			}
+
+		</style>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function(){
+
+				var cy = window.cy = cytoscape({
+					container: document.getElementById('cy'),
+
+					layout: {
+						name: 'cose',
+						animate: true
+					},
+
+					style: [
+						{
+							selector: 'node',
+							style: {
+								'label': 'data(name)',
+								'font-size': 10,
+								'text-valign': 'center',
+								'height': 60,
+								'width': 60,
+								'color': '#000000',
+								'background-color': '#3a7ecf'
+							
+							}
+						},
+
+						{
+							selector: 'edge',
+							style: {
+								'width': 2,
+								'line-color': '#3a7ecf',
+								'opacity': 0.5,
+								'curve-style': 'bezier',
+								'target-arrow-shape': 'triangle',
+								'target-arrow-color': '#3a7ecf'
+							}
+						}
+					],
+
+					"elements": graphData
+				});
+
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>cytoscape-avsdf demo</h1>
+
+		<div id="cy" class=" __________cytoscape_container" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><div style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative; z-index: 0; overflow: hidden; width: 1263px; height: 503px;"><canvas data-id="layer0-selectbox" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 3; width: 1263px; height: 503px;"></canvas><canvas data-id="layer1-drag" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 2; width: 1263px; height: 503px;"></canvas><canvas data-id="layer2-node" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 1; width: 1263px; height: 503px;"></canvas></div></div>
+
+	
+
+
+</body></html>

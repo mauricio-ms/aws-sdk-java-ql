@@ -48,6 +48,10 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
             this.parameters = parameters;
         }
 
+        public Map<String, Object> parameters() {
+            return parameters;
+        }
+
         @Override
         public String toString() {
             return parameters.toString();
@@ -331,6 +335,18 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
             }
         }
         return null;
+    }
+
+    public Map<String, AbstractResource> getSqsQueuesTable() {
+        return sqsQueuesTable;
+    }
+
+    public Map<String, AbstractResource> getSnsTopicsTable() {
+        return snsTopicsTable;
+    }
+
+    public Map<String, SsmParameter> getSsmParametersTable() {
+        return ssmParametersTable;
     }
 
     @Override
