@@ -41,7 +41,7 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
         }
     }
 
-    static class AbstractResource {
+    public static class AbstractResource {
         private final Map<String, Object> parameters;
 
         AbstractResource(Map<String, Object> parameters) {
@@ -104,9 +104,9 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
                 case SQS_QUEUE -> sqsQueuesTable.put(resourceKey, new AbstractResource(parseParameters(resourceObject)));
                 case SNS_TOPIC -> snsTopicsTable.put(resourceKey, new AbstractResource(parseParameters(resourceObject)));
                 case SSM_PARAMETER -> {
-                    var properties = parseParameters(resourceObject);
-                    Map.Entry<String, String> value = (Map.Entry<String, String>) properties.get("Value");
-                    ssmParametersTable.put(resourceKey, new SsmParameter((String) properties.get("Name"), value.getKey(), value.getValue()));
+//                    var properties = parseParameters(resourceObject);
+//                    Map.Entry<String, String> value = (Map.Entry<String, String>) properties.get("Value");
+//                    ssmParametersTable.put(resourceKey, new SsmParameter((String) properties.get("Name"), value.getKey(), value.getValue()));
                 }
             }
         }

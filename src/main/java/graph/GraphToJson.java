@@ -36,10 +36,8 @@ public class GraphToJson {
         }
 
         JSONObject jsonObject = new JSONObject();
-        JSONObject elements = new JSONObject();
-        elements.put("nodes", nodes);
-        elements.put("edges", edges);
-        jsonObject.put("elements", elements);
+        jsonObject.put("nodes", nodes);
+        jsonObject.put("edges", edges);
         return jsonObject;
     }
 }
