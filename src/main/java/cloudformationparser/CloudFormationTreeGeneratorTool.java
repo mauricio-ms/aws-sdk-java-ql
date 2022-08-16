@@ -19,10 +19,9 @@ public class CloudFormationTreeGeneratorTool {
 //            String projectPath = StdIn.readString();
 //            parse(projectPath);
 //        }
-        ServicesSymbolTable.setCurrent("api-audiotag");
         String filePath = "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/infrastructure/stack.yaml";
         var cloudFormationSymbolsTable = parse(filePath);
-        cloudFormationSymbolsTable.populateGraph();
+        cloudFormationSymbolsTable.populateGraph("api-audiotag");
 
 //        JSONObject jsonObject = new GraphToJson(ServicesGraph.get()).build();
 //        System.out.println(jsonObject);

@@ -156,6 +156,11 @@ public class CloudFormationSymbolsTable {
         return parametersTable.get(key);
     }
 
+    public Object getParameterValue(String key) {
+        Map<String, Object> parameter = getParameter(key);
+        return parameter.getOrDefault("Value", parameter.get("Default"));
+    }
+
     public void addStack(String key, CloudFormationStack cloudFormationStack) {
         stacksTable.put(key, cloudFormationStack);
     }
@@ -194,7 +199,7 @@ public class CloudFormationSymbolsTable {
                 .orElseGet(() -> finder.apply(snsTopicsTable));
     }
 
-    public void populateGraph() {
+    public void populateGraph(String originService) {
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
             ServicesSymbolTable.add((String) sqsQueueEntry.getValue().parameters().get("QueueName"));
         }
@@ -203,7 +208,10 @@ public class CloudFormationSymbolsTable {
             ServicesSymbolTable.add((String) snsTopicEntry.getValue().parameters().get("TopicName"));
         }
 
-        Integer currentServiceKey = ServicesSymbolTable.getKey(ServicesSymbolTable.current());
+        Integer currentServiceKey = ServicesSymbolTable.getKey(originService);
+        if (currentServiceKey == null) {
+            currentServiceKey = ServicesSymbolTable.add(originService);
+        }
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
             ServicesGraph.addEdge(currentServiceKey, ServicesSymbolTable.getKey((String) sqsQueueEntry.getValue().parameters().get("QueueName")));
         }

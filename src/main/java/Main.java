@@ -27,14 +27,15 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
         for (String projectPath : List.of(
-                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-distribution",
-                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet"
+//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet",
+//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-distribution",
+                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track",
+                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-inventory"
         )) {
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
-            ServicesSymbolTable.setCurrent(project);
             Node nodeProject = new Node(project, Node.Type.PROJECT);
             tree.addChild(nodeProject);
 
@@ -61,7 +62,7 @@ public class Main {
         //  populate it in the graph
         for (Node cloudFormationSymbolsTableNode : tree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
             CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
-            cloudFormationSymbolsTable.populateGraph();
+            cloudFormationSymbolsTable.populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
         }
 
         // then, get all cloudFormationSymbolsTable that are stack.yaml again
@@ -86,9 +87,9 @@ public class Main {
                 parser.setBuildParseTree(true);
                 var parseTree = parser.file().getRuleContext();
 
-                CloudFormationTemplateToSymbolsTable cloudFormationTemplateToSymbolsTable = new CloudFormationTemplateToSymbolsTable("", cloudFormationStack.getParameters());
+                CloudFormationTemplateToSymbolsTable cloudFormationTemplateToSymbolsTable = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
                 cloudFormationTemplateToSymbolsTable.visit(parseTree);
-                cloudFormationTemplateToSymbolsTable.getCloudFormationSymbolsTable().populateGraph();
+                cloudFormationTemplateToSymbolsTable.getCloudFormationSymbolsTable().populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
             }
         }
 

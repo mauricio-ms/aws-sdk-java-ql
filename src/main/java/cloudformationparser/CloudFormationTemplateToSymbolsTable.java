@@ -264,8 +264,7 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
         if (!cloudFormationSymbolsTable.containsParameter(name)) {
             return null;
         }
-        Map<String, Object> parameter = cloudFormationSymbolsTable.getParameter(name);
-        return (String) parameter.getOrDefault("Value", parameter.get("Default"));
+        return (String) cloudFormationSymbolsTable.getParameterValue(name);
     }
 
     private Map.Entry<String, String> parseAttributeGetter(YamlParser.AttributeGetterContext ctx) {

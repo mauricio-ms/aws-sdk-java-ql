@@ -28,10 +28,10 @@ public final class ServicesSymbolTable {
         add(service);
     }
 
-    public static void add(String service) {
+    public static Integer add(String service) {
         table.put(service, counter);
         names.add(service);
-        counter++;
+        return counter++;
     }
 
     public static Integer getKey(String service) {
