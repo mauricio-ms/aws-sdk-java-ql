@@ -6,6 +6,11 @@ antlr4 -Dlanguage=Java JavaParser.g4
 cd src/main/java/cloudformationparser
 antlr4 -no-listener -visitor -package cloudformationparser Yaml.g4
 
+# Inspecting the tree
+mkdir temp
+cp Yaml.g4 temp/
+antlr4 Yaml.g4 && javac Yaml*.java && grun Yaml file -gui <yaml-file>
+
 # Compile
 mvn package
 

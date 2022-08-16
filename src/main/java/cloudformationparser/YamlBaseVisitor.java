@@ -59,13 +59,6 @@ public class YamlBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Y
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFile2(YamlParser.File2Context ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitList(YamlParser.ListContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

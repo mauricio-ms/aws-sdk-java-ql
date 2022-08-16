@@ -79,22 +79,15 @@ public class Main {
                 Node clientStackNode = projectNode
                         .findUnique(Node.Type.CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE);
 
-                var input = new FileInputStream((String) clientStackNode.value);
-                var chars = CharStreams.fromStream(input);
-                var lexer = new YamlLexer(chars);
-                var tokens = new CommonTokenStream(lexer);
-                var parser = new YamlParser(tokens);
-                parser.setBuildParseTree(true);
-                var parseTree = parser.file().getRuleContext();
-
-                CloudFormationTemplateToSymbolsTable cloudFormationTemplateToSymbolsTable = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
-                cloudFormationTemplateToSymbolsTable.visit(parseTree);
-                cloudFormationTemplateToSymbolsTable.getCloudFormationSymbolsTable().populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
+                var parseTree = CloudFormationTreeGeneratorTool.getParseTree((String) clientStackNode.value);
+                CloudFormationTemplateToSymbolsTable visitor = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
+                visitor.visit(parseTree);
+                visitor.getCloudFormationSymbolsTable().populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
             }
         }
 
-        StdOut.println("Tree");
-        tree.show();
+//        StdOut.println("Tree");
+//        tree.show();
         tree.walk(new TreeListener(tree));
 
         StdOut.println("Graph");

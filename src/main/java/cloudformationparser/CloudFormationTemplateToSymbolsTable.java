@@ -21,6 +21,7 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
 
     @Override
     public Object visitObject(YamlParser.ObjectContext ctx) {
+        System.out.println("VisitObject");
         switch (ctx.key().getText()) {
             case "Parameters" -> {
                 parseObject(ctx).forEach(cloudFormationSymbolsTable::addParameter);

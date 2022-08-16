@@ -47,12 +47,6 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitObjectbody(YamlParser.ObjectbodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link YamlParser#file2}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFile2(YamlParser.File2Context ctx);
-	/**
 	 * Visit a parse tree produced by {@link YamlParser#list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

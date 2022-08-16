@@ -137,10 +137,6 @@ objectbody
   * my new parser
   */
 
-file2
- : (list | mappinglist) EOF
- ;
-
 list
  : (NEWLINE* listitem NEWLINE?)+
  ;
@@ -154,7 +150,8 @@ listitemvaluerest
  ;
 
 listitemvalue
- : mapping
+ : mappinglist
+ | mapping
  | object
  | value
  | list
@@ -167,7 +164,7 @@ action
  ;
 
 mappinglist
- : NEWLINE* mapping (NEWLINE+ mapping)* NEWLINE*
+ : key COLON NEWLINE INDENT listitemvalue+ DEDENT (mappinglist)*
  ;
 
 key

@@ -2,6 +2,7 @@ package cloudformationparser;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RuleContext;
 import services.ServicesSymbolTable;
 
 import java.io.FileInputStream;
@@ -30,18 +31,22 @@ public class CloudFormationTreeGeneratorTool {
     public static CloudFormationSymbolsTable parse(String stackFilePath) {
         try {
             System.out.println("Parsing " + stackFilePath);
-            var input = new FileInputStream(stackFilePath);
-            var chars = CharStreams.fromStream(input);
-            var lexer = new YamlLexer(chars);
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new YamlParser(tokens);
-            parser.setBuildParseTree(true);
-            var tree = parser.file().getRuleContext();
+            var tree = getParseTree(stackFilePath);
             var cloudFormationTemplateToSymbolsTable = new CloudFormationTemplateToSymbolsTable(stackFilePath);
             cloudFormationTemplateToSymbolsTable.visit(tree);
             return cloudFormationTemplateToSymbolsTable.getCloudFormationSymbolsTable();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static RuleContext getParseTree(String stackFilePath) throws IOException {
+        var input = new FileInputStream(stackFilePath);
+        var chars = CharStreams.fromStream(input);
+        var lexer = new YamlLexer(chars);
+        var tokens = new CommonTokenStream(lexer);
+        var parser = new YamlParser(tokens);
+        parser.setBuildParseTree(true);
+        return parser.file().getRuleContext();
     }
 }
