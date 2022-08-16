@@ -95,6 +95,12 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValue(YamlParser.ValueContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#arn}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArn(YamlParser.ArnContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#attributeGetter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

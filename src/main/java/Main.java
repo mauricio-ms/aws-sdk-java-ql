@@ -25,15 +25,16 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
 //        for (String projectPath : List.of(
-////                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet",
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-contract",
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track",
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-inventory"
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-collab"
 //        )) {
-        while (!StdIn.isEmpty()) {
-            String projectPath = StdIn.readString();
+        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp")).toList()) {
+            String projectPath = p.toString();
+//        while (!StdIn.isEmpty()) {
+//            String projectPath = StdIn.readString();
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
+            System.out.println(">> Analyzing project " + project);
+
             Node nodeProject = new Node(project, Node.Type.PROJECT);
             tree.addChild(nodeProject);
 
@@ -47,7 +48,6 @@ public class Main {
                 nodeProject.addChild(new Node(cloudFormationSymbolTable, type));
             }
 
-            System.out.println(">> Analyzing project " + project);
             String projectFilesPath = projectPath + SRC;
             try (Stream<Path> pathStream = Files.walk(Paths.get(projectFilesPath))) {
                 pathStream

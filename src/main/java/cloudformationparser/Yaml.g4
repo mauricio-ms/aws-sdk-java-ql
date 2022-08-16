@@ -173,7 +173,11 @@ key
  ;
 
 value
- : boolean | NAME | number | STRING_LITERAL | tagArray | array | parameter | attributeGetter
+ : boolean | NAME | number | STRING_LITERAL | tagArray | array | parameter | attributeGetter | arn
+ ;
+
+arn
+ : NAME COLON ((NAME | number) COLON?)+
  ;
 
 attributeGetter
@@ -1630,4 +1634,5 @@ fragment ID_CONTINUE
  | [\uFF10-\uFF19]
  | '\uFF3F'
  | '\u003A' '\u003A'
+ | '\u002D'
  ;
