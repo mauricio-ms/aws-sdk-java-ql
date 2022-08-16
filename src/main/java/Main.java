@@ -8,11 +8,8 @@ import javaparser.CustomJavaParserListener;
 import javaparser.JavaLexer;
 import javaparser.JavaParser;
 import services.ServicesGraph;
-import services.ServicesSymbolTable;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,7 +25,7 @@ public class Main {
         Node tree = new Node(null, null);
         for (String projectPath : List.of(
 //                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet",
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-distribution",
+                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-contract",
                 "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track",
                 "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-inventory"
         )) {
@@ -70,20 +67,7 @@ public class Main {
         //      if it has, so get the cloudFormationSymbolsTable and populate in the graph accordingly
         for (Node cloudFormationSymbolsTableNode : tree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
             CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
-            for (var cloudFormationStack : cloudFormationSymbolsTable.getStacks()) {
-                // find the CloudFormationSymbolsTable for the service
-                Node projectNode = tree.find("api-" + cloudFormationStack.getService(), Node.Type.PROJECT);
-                if (projectNode == null) {
-                    continue;
-                }
-                Node clientStackNode = projectNode
-                        .findUnique(Node.Type.CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE);
-
-                var parseTree = CloudFormationTreeGeneratorTool.getParseTree((String) clientStackNode.value);
-                CloudFormationTemplateToSymbolsTable visitor = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
-                visitor.visit(parseTree);
-                visitor.getCloudFormationSymbolsTable().populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
-            }
+            processInnerStacks(tree, cloudFormationSymbolsTable);
         }
 
 //        StdOut.println("Tree");
@@ -94,6 +78,25 @@ public class Main {
         ServicesGraph.show();
         Files.write(Paths.get(Main.class.getClassLoader().getResource("graph-data.js").getPath()),
                 ("const graphData = " + ServicesGraph.toJson() + ";").getBytes());
+    }
+
+    private static void processInnerStacks(Node tree, CloudFormationSymbolsTable cloudFormationSymbolsTable) throws IOException {
+        for (var cloudFormationStack : cloudFormationSymbolsTable.getStacks()) {
+            // find the CloudFormationSymbolsTable for the service
+            Node projectNode = tree.find("api-" + cloudFormationStack.getService(), Node.Type.PROJECT);
+            if (projectNode == null) {
+                continue;
+            }
+            Node clientStackNode = projectNode
+                    .findUnique(Node.Type.CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE);
+
+            var parseTree = CloudFormationTreeGeneratorTool.getParseTree((String) clientStackNode.value);
+            CloudFormationTemplateToSymbolsTable visitor = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
+            visitor.visit(parseTree);
+            CloudFormationSymbolsTable cloudFormationClientSymbolsTable = visitor.getCloudFormationSymbolsTable();
+            cloudFormationClientSymbolsTable.populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
+            processInnerStacks(tree, cloudFormationClientSymbolsTable);
+        }
     }
 
     private static void parse(Node nodeProject, String filePath) {
