@@ -1,86 +1,30 @@
 package cloudformationparser;
 
+import cloudformationparser.exception.SsmParameterNotRecognizedException;
 import org.antlr.v4.runtime.RuleContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
 
-    private Map<String, Map<String, Object>> parametersTable;
+    private final CloudFormationSymbolsTable cloudFormationSymbolsTable;
 
-    private final Map<String, AbstractResource> sqsQueuesTable;
-
-    private final Map<String, AbstractResource> snsTopicsTable;
-
-    private final Map<String, SsmParameter> ssmParametersTable;
-
-    public CloudFormationTemplateToSymbolsTable() {
-        sqsQueuesTable = new HashMap<>();
-        snsTopicsTable = new HashMap<>();
-        ssmParametersTable = new HashMap<>();
+    public CloudFormationTemplateToSymbolsTable(String name) {
+        cloudFormationSymbolsTable = new CloudFormationSymbolsTable(name);
     }
 
-    enum ResourceType {
-        SQS_QUEUE("AWS::SQS::Queue"),
-        SNS_TOPIC("AWS::SNS::Topic"),
-        SSM_PARAMETER("AWS::SSM::Parameter");
-
-        private final String value;
-
-        ResourceType(String value) {
-            this.value = value;
-        }
-
-        public static ResourceType get(String value) {
-            return Stream.of(values())
-                    .filter(v -> v.value.equals(value))
-                    .findFirst()
-                    .orElse(null);
-        }
-    }
-
-    public static class AbstractResource {
-        private final Map<String, Object> parameters;
-
-        AbstractResource(Map<String, Object> parameters) {
-            this.parameters = parameters;
-        }
-
-        public Map<String, Object> parameters() {
-            return parameters;
-        }
-
-        @Override
-        public String toString() {
-            return parameters.toString();
-        }
-    }
-
-    static class SsmParameter {
-        private final String name;
-        private final String resourceKey;
-        private final String resourceAttributeValue;
-
-        SsmParameter(String name, String resourceKey, String resourceAttributeValue) {
-            this.name = name;
-            this.resourceKey = resourceKey;
-            this.resourceAttributeValue = resourceAttributeValue;
-        }
-
-        @Override
-        public String toString() {
-            return name + " -> " + resourceKey + "." + resourceAttributeValue;
-        }
+    public CloudFormationTemplateToSymbolsTable(String name, Map<String, Map<String, Object>> parameters) {
+        cloudFormationSymbolsTable = new CloudFormationSymbolsTable(name);
+        parameters.forEach(cloudFormationSymbolsTable::addParameter);
     }
 
     @Override
     public Object visitObject(YamlParser.ObjectContext ctx) {
         switch (ctx.key().getText()) {
             case "Parameters" -> {
-                parametersTable = parseObject(ctx);
-                Map<String, Object> env = parametersTable.get("Env");
+                parseObject(ctx).forEach(cloudFormationSymbolsTable::addParameter);
+                Map<String, Object> env = cloudFormationSymbolsTable.getParameter("Env");
                 if (env != null && !env.containsKey("Default")) {
                     env.put("Default", "dev");
                 }
@@ -94,25 +38,32 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
     private void parseResources(YamlParser.ObjectContext ctx) {
         for (var resource : ctx.objectbody().statement()) {
             var resourceObject = resource.object();
-            ResourceType resourceType = getResourceType(resourceObject);
+            CloudFormationSymbolsTable.ResourceType resourceType = getResourceType(resourceObject);
             if (resourceType == null) {
                 continue;
             }
 
             String resourceKey = resourceObject.key().getText();
             switch (resourceType) {
-                case SQS_QUEUE -> sqsQueuesTable.put(resourceKey, new AbstractResource(parseParameters(resourceObject)));
-                case SNS_TOPIC -> snsTopicsTable.put(resourceKey, new AbstractResource(parseParameters(resourceObject)));
+                case CLOUD_FORMATION_STACK ->
+                        cloudFormationSymbolsTable.addStack(resourceKey, new CloudFormationSymbolsTable.CloudFormationStack(parseParameters(resourceObject)));
+                case SQS_QUEUE ->
+                        cloudFormationSymbolsTable.addSqsQueue(resourceKey, new CloudFormationSymbolsTable.AbstractResource(parseParameters(resourceObject)));
+                case SNS_TOPIC ->
+                        cloudFormationSymbolsTable.addSnsTopic(resourceKey, new CloudFormationSymbolsTable.AbstractResource(parseParameters(resourceObject)));
                 case SSM_PARAMETER -> {
-//                    var properties = parseParameters(resourceObject);
-//                    Map.Entry<String, String> value = (Map.Entry<String, String>) properties.get("Value");
-//                    ssmParametersTable.put(resourceKey, new SsmParameter((String) properties.get("Name"), value.getKey(), value.getValue()));
+                    try {
+                        CloudFormationSymbolsTable.SsmParameter ssmParameter = new CloudFormationSymbolsTable.SsmParameter(parseParameters(resourceObject));
+                        cloudFormationSymbolsTable.addSsmParameter(ssmParameter.getParameterKey(), ssmParameter);
+                    } catch (SsmParameterNotRecognizedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
 
-    private ResourceType getResourceType(YamlParser.ObjectContext ctx) {
+    private CloudFormationSymbolsTable.ResourceType getResourceType(YamlParser.ObjectContext ctx) {
         if (ctx == null) {
             return null;
         }
@@ -122,7 +73,7 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
             if (mapping != null) {
                 var mappingEntry = parseMapping(mapping);
                 if ("Type".equals(mappingEntry.getKey())) {
-                    return ResourceType.get(mappingEntry.getValue().toString());
+                    return CloudFormationSymbolsTable.ResourceType.get(mappingEntry.getValue().toString());
                 }
             }
         }
@@ -146,7 +97,7 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
                         }
                     } else if (propertyStatement.object() != null) {
                         if ("Parameters".equals(propertyStatement.object().key().getText())) {
-                            parameters.putAll(parseObject(propertyStatement.object()));
+                            parameters.put("Parameters", parseObject(propertyStatement.object()));
                         }
                     }
                 }
@@ -310,10 +261,10 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
 
     private String parseParameter(YamlParser.ParameterContext ctx) {
         String name = ctx.NAME().getText();
-        if (!parametersTable.containsKey(name)) {
+        if (!cloudFormationSymbolsTable.containsParameter(name)) {
             return null;
         }
-        Map<String, Object> parameter = parametersTable.get(name);
+        Map<String, Object> parameter = cloudFormationSymbolsTable.getParameter(name);
         return (String) parameter.getOrDefault("Value", parameter.get("Default"));
     }
 
@@ -337,24 +288,8 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
         return null;
     }
 
-    public Map<String, AbstractResource> getSqsQueuesTable() {
-        return sqsQueuesTable;
-    }
-
-    public Map<String, AbstractResource> getSnsTopicsTable() {
-        return snsTopicsTable;
-    }
-
-    public Map<String, SsmParameter> getSsmParametersTable() {
-        return ssmParametersTable;
-    }
-
-    @Override
-    public String toString() {
-        return "==== Parameters ====\n" + mapToString(parametersTable) + "\n\n" +
-                "==== SQS Queues ====\n" + mapToString(sqsQueuesTable) + "\n\n" +
-                "==== SNS Topics ====\n" + mapToString(snsTopicsTable) + "\n\n" +
-                "==== SSM Parameters ====\n" + mapToString(ssmParametersTable);
+    public CloudFormationSymbolsTable getCloudFormationSymbolsTable() {
+        return cloudFormationSymbolsTable;
     }
 
     private String mapToString(Map<?, ?> map) {

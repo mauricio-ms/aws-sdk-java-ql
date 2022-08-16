@@ -1,52 +1,46 @@
 package cloudformationparser;
 
-import graph.GraphToJson;
-import graph.StdIn;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.json.JSONObject;
-import services.ServicesGraph;
 import services.ServicesSymbolTable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class CloudFormationTreeGeneratorTool {
 
     public static void main(String[] args) {
-        while (!StdIn.isEmpty()) {
-            String projectPath = StdIn.readString();
-            String[] projectParts = projectPath.split("/");
-            String project = projectParts[projectParts.length - 1];
-            ServicesSymbolTable.setCurrent(project);
-            parse(projectPath + "/infrastructure/stack.yaml");
-        }
-//        ServicesSymbolTable.setCurrent("api-audiotag");
-//        String filePath = "/home/mauricio/development/aws-sdk-java-ql/java-ast-generator/src/main/java/cloudformationparser/stack.yaml";
-//        parse(filePath);
+//        while (!StdIn.isEmpty()) {
+//            String projectPath = StdIn.readString();
+//            parse(projectPath);
+//        }
+        ServicesSymbolTable.setCurrent("api-audiotag");
+        String filePath = "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/infrastructure/stack.yaml";
+        var cloudFormationSymbolsTable = parse(filePath);
+        cloudFormationSymbolsTable.populateGraph();
 
-        JSONObject jsonObject = new GraphToJson(ServicesGraph.get()).build();
-        System.out.println(jsonObject);
+//        JSONObject jsonObject = new GraphToJson(ServicesGraph.get()).build();
+//        System.out.println(jsonObject);
     }
 
-    private static void parse(String filePath) {
+    public static CloudFormationSymbolsTable parse(String stackFilePath) {
         try {
-            System.out.println("Parsing " + filePath);
-            var input = new FileInputStream(filePath);
+            System.out.println("Parsing " + stackFilePath);
+            var input = new FileInputStream(stackFilePath);
             var chars = CharStreams.fromStream(input);
             var lexer = new YamlLexer(chars);
             var tokens = new CommonTokenStream(lexer);
             var parser = new YamlParser(tokens);
             parser.setBuildParseTree(true);
             var tree = parser.file().getRuleContext();
-            var cloudFormationTreeGeneratorVisitor = new CloudFormationTemplateToSymbolsTable();
-            cloudFormationTreeGeneratorVisitor.visit(tree);
-//            System.out.println(cloudFormationTreeGeneratorVisitor);
-
-            new CloudFormationSymbolsTableProcessor(
-                    cloudFormationTreeGeneratorVisitor.getSqsQueuesTable(),
-                    cloudFormationTreeGeneratorVisitor.getSnsTopicsTable())
-                    .process();
+            var cloudFormationTemplateToSymbolsTable = new CloudFormationTemplateToSymbolsTable(stackFilePath);
+            cloudFormationTemplateToSymbolsTable.visit(tree);
+            return cloudFormationTemplateToSymbolsTable.getCloudFormationSymbolsTable();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

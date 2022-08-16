@@ -1,6 +1,8 @@
 package services;
 
 import graph.Graph;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public final class ServicesGraph {
 
@@ -15,5 +17,44 @@ public final class ServicesGraph {
 
     public static Graph get() {
         return graph;
+    }
+
+    public static void show() {
+        String s = graph.v() + " vertices, " + graph.e() + " edges\n";
+        for (int i = 0; i < ServicesSymbolTable.getCounter(); i++) {
+            s += ServicesSymbolTable.getName(i) + ": ";
+            for (int w : graph.adj(i)) {
+                s += ServicesSymbolTable.getName(w) + " ";
+            }
+            s += "\n";
+        }
+        System.out.println(s);
+    }
+
+    public static JSONObject toJson() {
+        JSONArray nodes = new JSONArray();
+        JSONArray edges = new JSONArray();
+        int edgesCounter = 0;
+        for (int i = 0; i < ServicesSymbolTable.keys().length; i++) {
+            JSONObject node = new JSONObject();
+            JSONObject nodeData = new JSONObject();
+            nodeData.put("id", String.valueOf(i));
+            nodeData.put("name", ServicesSymbolTable.getName(i));
+            node.put("data", nodeData);
+            nodes.put(i, node);
+            for (int w : graph.adj(i)) {
+                JSONObject edge = new JSONObject();
+                JSONObject edgeData = new JSONObject();
+                edgeData.put("source", String.valueOf(i));
+                edgeData.put("target", String.valueOf(w));
+                edge.put("data", edgeData);
+                edges.put(edgesCounter++, edge);
+            }
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("nodes", nodes);
+        jsonObject.put("edges", edges);
+        return jsonObject;
     }
 }

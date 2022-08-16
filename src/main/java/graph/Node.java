@@ -23,6 +23,8 @@ public class Node {
     }
 
     public enum Type {
+        CLOUD_FORMATION_STACK_SYMBOLS_TABLE(-2),
+        CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE(-1),
         PROJECT(0),
         INTERFACE(1),
         CLASS(2),
@@ -79,23 +81,26 @@ public class Node {
         return null;
     }
 
-    public Node find(Node.Type type) {
+    public Node findUnique(Node.Type type) {
+        List<Node> nodes = find(type);
+        return !nodes.isEmpty() ? nodes.get(0) : null;
+    }
+
+    public List<Node> find(Node.Type type) {
         return findRec(this, type);
     }
 
-    private Node findRec(Node current, Node.Type type) {
+    private List<Node> findRec(Node current, Node.Type type) {
+        List<Node> nodes = new ArrayList<>();
         if (type.equals(current.type)) {
-            return current;
+            nodes.add(current);
         }
 
         for (Node child : current.children) {
-            Node found = findRec(child, type);
-            if (found != null) {
-                return found;
-            }
+            nodes.addAll(findRec(child, type));
         }
 
-        return null;
+        return nodes;
     }
 
     public Node find(Object value, Node.Type type) {

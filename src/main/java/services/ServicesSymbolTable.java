@@ -15,6 +15,10 @@ public final class ServicesSymbolTable {
     private ServicesSymbolTable() {
     }
 
+    public static Integer getCounter() {
+        return counter;
+    }
+
     public static String current() {
         return current;
     }
