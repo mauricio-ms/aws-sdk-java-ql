@@ -10,7 +10,9 @@ import javaparser.JavaParser;
 import services.ServicesGraph;
 import services.ServicesSymbolTable;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,12 +26,12 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-        while (!StdIn.isEmpty()) {
-//        for (String projectPath : List.of(
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audio",
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track"
-//        )) {
-            String projectPath = StdIn.readString();
+        for (String projectPath : List.of(
+                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-distribution",
+                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet"
+        )) {
+//        while (!StdIn.isEmpty()) {
+//            String projectPath = StdIn.readString();
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
             ServicesSymbolTable.setCurrent(project);
@@ -68,8 +70,6 @@ public class Main {
         for (Node cloudFormationSymbolsTableNode : tree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
             CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
             for (var cloudFormationStack : cloudFormationSymbolsTable.getStacks()) {
-                System.out.println(cloudFormationStack.getService());
-                System.out.println(cloudFormationStack.getParameters());
                 // find the CloudFormationSymbolsTable for the service
                 Node projectNode = tree.find("api-" + cloudFormationStack.getService(), Node.Type.PROJECT);
                 if (projectNode == null) {
@@ -92,22 +92,18 @@ public class Main {
             }
         }
 
-//        graph.Node nodeProject = new graph.Node("api-audiotag", graph.Node.Type.PROJECT);
-//        tree.addChild(nodeProject);
-//        parse(nodeProject, "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-audiotag/src/main/java/com/beatstars/audiotag/data/model/Language.java");
-
         StdOut.println("Tree");
         tree.show();
         tree.walk(new TreeListener(tree));
 
-        System.out.println("graph.Graph");
+        StdOut.println("Graph");
         ServicesGraph.show();
-        System.out.println(ServicesGraph.toJson());
+        Files.write(Paths.get(Main.class.getClassLoader().getResource("graph-data.js").getPath()),
+                ("const graphData = " + ServicesGraph.toJson() + ";").getBytes());
     }
 
     private static void parse(Node nodeProject, String filePath) {
         try {
-//            System.out.println("\t" + filePath);
             var input = new FileInputStream(filePath);
             var chars = CharStreams.fromStream(input);
             var lexer = new JavaLexer(chars);

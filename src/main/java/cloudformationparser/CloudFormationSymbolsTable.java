@@ -90,14 +90,15 @@ public class CloudFormationSymbolsTable {
 
         SsmParameter(Map<String, Object> properties) throws SsmParameterNotRecognizedException {
             name = (String) properties.get("Name");
-            Map.Entry<String, String> value = (Map.Entry<String, String>) properties.get("Value");
-            if (value == null) {
+            Object value = properties.get("Value");
+            if (!(value instanceof Map.Entry<?,?>)) {
                 throw new SsmParameterNotRecognizedException(name);
             }
             String[] nameParts = name.split("/");
             parameterKey = nameParts[nameParts.length - 1];
-            resourceKey = value.getKey();
-            resourceAttributeValue = value.getValue();
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) value;
+            resourceKey = entry.getKey();
+            resourceAttributeValue = entry.getValue();
         }
 
         public String getParameterKey() {
