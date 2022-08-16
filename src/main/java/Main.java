@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class Main {
@@ -23,14 +24,14 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-        for (String projectPath : List.of(
-//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet",
-                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-contract",
-                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track",
-                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-inventory"
-        )) {
-//        while (!StdIn.isEmpty()) {
-//            String projectPath = StdIn.readString();
+//        for (String projectPath : List.of(
+////                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-wallet",
+//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-contract",
+//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-track",
+//                "/home/mauricio/development/aws-sdk-java-ql/projects_tmp/api-inventory"
+//        )) {
+        while (!StdIn.isEmpty()) {
+            String projectPath = StdIn.readString();
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
             Node nodeProject = new Node(project, Node.Type.PROJECT);
@@ -46,7 +47,7 @@ public class Main {
                 nodeProject.addChild(new Node(cloudFormationSymbolTable, type));
             }
 
-            System.out.println("Analyzing project " + project);
+            System.out.println(">> Analyzing project " + project);
             String projectFilesPath = projectPath + SRC;
             try (Stream<Path> pathStream = Files.walk(Paths.get(projectFilesPath))) {
                 pathStream
@@ -76,8 +77,31 @@ public class Main {
 
         StdOut.println("Graph");
         ServicesGraph.show();
-        Files.write(Paths.get(Main.class.getClassLoader().getResource("graph-data.js").getPath()),
-                ("const graphData = " + ServicesGraph.toJson() + ";").getBytes());
+        generateHtml();
+    }
+
+    private static void generateHtml() throws IOException {
+        Path generationDir = Paths.get(".gen");
+        if (Files.notExists(generationDir)) {
+            Files.createDirectory(generationDir);
+        }
+        Consumer<String> resourceCopier = filePath -> {
+            try {
+                Path targetPath = Paths.get(".gen", filePath);
+                if (Files.notExists(targetPath)) {
+                    Files.copy(Main.class.getClassLoader().getResourceAsStream(filePath), targetPath);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        resourceCopier.accept("graph-viewer.html");
+        resourceCopier.accept("avsdf-base.js");
+        resourceCopier.accept("cytoscape.min.js");
+        resourceCopier.accept("cytoscape-avsdf.js");
+        resourceCopier.accept("layout-base.js");
+        resourceCopier.accept("shim.min.js");
+        Files.write(Paths.get(".gen", "graph-data.js"), ("const graphData = " + ServicesGraph.toJson() + ";").getBytes());
     }
 
     private static void processInnerStacks(Node tree, CloudFormationSymbolsTable cloudFormationSymbolsTable) throws IOException {
@@ -116,7 +140,11 @@ public class Main {
     }
 
     private static List<Path> getStacksFilesPath(String projectPath) {
-        try (Stream<Path> stackFilesStream = Files.list(Path.of(projectPath, "infrastructure"))) {
+        Path infrastructurePath = Path.of(projectPath, "infrastructure");
+        if (Files.notExists(infrastructurePath)) {
+            return List.of();
+        }
+        try (Stream<Path> stackFilesStream = Files.list(infrastructurePath)) {
             List<Path> stackFilesPath = stackFilesStream
                     .filter(p -> !p.getFileName().toString().startsWith(".") && p.getFileName().toString().endsWith(".yaml"))
                     .toList();

@@ -1,1 +1,0 @@
-/home/mauricio/development/beatstars/api-contract

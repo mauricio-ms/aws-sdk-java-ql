@@ -28,10 +28,10 @@ public class TreeListener implements Consumer<Node> {
             case PROJECT -> currentProjectNode = node;
             case CLASS -> currentClassNode = node;
             case SQS_LISTENER -> {
-//                ServicesCommunicationGraph.add(resolveResource(node.value.toString()), currentProjectNode.value.toString());
                 System.out.println("---->> " + node.value.toString());
                 String sourceService = resolveResource(node.value.toString());
                 if (sourceService != null) {
+                    System.out.printf("SQS_LISTENER: %s -> %s\n", sourceService, currentProjectNode.value);
                     ServicesGraph.addEdge(ServicesSymbolTable.getKey(sourceService), ServicesSymbolTable.getKey(currentProjectNode.value.toString()));
                 } else {
                     System.out.println("Source Service not added to the tree: " + node.value);
@@ -46,15 +46,17 @@ public class TreeListener implements Consumer<Node> {
                         Node propertiesNode = currentProjectNode.find(propertiesVariableNode.value, Node.Type.INTERFACE);
                         Node propertiesImplNode = propertiesNode.findUnique(Node.Type.CLASS);
                         String snsTopic = (String) propertiesImplNode.find(methodCallNodeValue.call).children.get(0).value;
-//                        ServicesCommunicationGraph.add(currentProjectNode.value.toString(), resolveResource(snsTopic));
-                        ServicesGraph.addEdge(ServicesSymbolTable.getKey(currentProjectNode.value.toString()), ServicesSymbolTable.getKey(resolveResource(snsTopic)));
+                        String targetResource = resolveResource(snsTopic);
+                        System.out.printf("SNS_SENDER::METHOD_CALL: %s -> %s\n", currentProjectNode.value, targetResource);
+                        ServicesGraph.addEdge(ServicesSymbolTable.getKey(currentProjectNode.value.toString()), ServicesSymbolTable.getKey(targetResource));
                     }
                     case INSTANCE_VARIABLE_ID -> {
                         String variableId = (String) child.value;
                         Node variableDeclarationNode = currentProjectNode.find(variableId, Node.Type.INSTANCE_VARIABLE_DECLARATION);
                         String snsTopic = (String) variableDeclarationNode.children.get(0).value;
-//                        ServicesCommunicationGraph.add(currentProjectNode.value.toString(), resolveResource(snsTopic));
-                        ServicesGraph.addEdge(ServicesSymbolTable.getKey(currentProjectNode.value.toString()), ServicesSymbolTable.getKey(resolveResource(snsTopic)));
+                        String targetResource = resolveResource(snsTopic);
+                        System.out.printf("SNS_SENDER::INSTANCE_VARIABLE_ID: %s -> (%s:%s)\n", currentProjectNode.value, snsTopic, targetResource);
+                        ServicesGraph.addEdge(ServicesSymbolTable.getKey(currentProjectNode.value.toString()), ServicesSymbolTable.getKey(targetResource));
                     }
                 }
             }

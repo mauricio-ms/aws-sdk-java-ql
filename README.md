@@ -21,4 +21,4 @@ java -cp target/java-ast-generator-1.0-SNAPSHOT-jar-with-dependencies.jar src/ma
 java -cp target/java-ast-generator-1.0-SNAPSHOT-jar-with-dependencies.jar src/main/java/cloudformationparser/CloudFormationTreeGeneratorTool.java
 
 # Pass projects via pipe
-ls -d ~/development/aws-sdk-java-ql/projects_tmp/* | <command>
+ls -d ~/development/aws-sdk-java-ql/beatstars/projects_tmp/* | <command>
