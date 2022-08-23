@@ -25,7 +25,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
 //        for (String projectPath : List.of(
-//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-collab"
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-chargebee"
 //        )) {
         for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp")).toList()) {
             String projectPath = p.toString();

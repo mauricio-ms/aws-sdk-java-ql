@@ -41,6 +41,12 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitObject(YamlParser.ObjectContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#mappingAttribute}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMappingAttribute(YamlParser.MappingAttributeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#objectbody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -95,11 +101,23 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValue(YamlParser.ValueContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link YamlParser#date}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDate(YamlParser.DateContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link YamlParser#arn}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitArn(YamlParser.ArnContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link YamlParser#path}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPath(YamlParser.PathContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link YamlParser#attributeGetter}.
 	 * @param ctx the parse tree
@@ -430,18 +448,6 @@ public interface YamlVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTest_nocond(YamlParser.Test_nocondContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link YamlParser#lambdef}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLambdef(YamlParser.LambdefContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link YamlParser#lambdef_nocond}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLambdef_nocond(YamlParser.Lambdef_nocondContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link YamlParser#or_test}.
 	 * @param ctx the parse tree

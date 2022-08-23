@@ -127,6 +127,11 @@ file
 
 object
  : key COLON NEWLINE INDENT (objectbody | list) DEDENT
+ | key COLONMAP OPEN_BRACE (mappingAttribute (COMMA mappingAttribute)*) CLOSE_BRACE
+ ;
+
+mappingAttribute
+ : STRING_LITERAL COLONMAP value
  ;
 
 objectbody
@@ -173,11 +178,20 @@ key
  ;
 
 value
- : boolean | NAME | number | STRING_LITERAL | tagArray | array | parameter | attributeGetter | arn
+ : boolean | NAME | number | STRING_LITERAL | date | path | tagArray | array | parameter | attributeGetter | arn
+ ;
+
+date
+ : number '-' number '-' number
  ;
 
 arn
- : NAME COLON ((NAME | number) COLON?)+
+ : NAME COLON ((NAME | number | path) COLON?)+ STAR?
+ ;
+
+path
+ : NAME ('/' NAME)*
+ | NAME ('.' NAME)*
  ;
 
 attributeGetter
@@ -515,26 +529,14 @@ suite
  | NEWLINE INDENT stmt+ DEDENT
  ;
 
-/// test: or_test ['if' or_test 'else' test] | lambdef
+/// test: or_test ['if' or_test 'else' test]
 test
  : or_test ( IF or_test ELSE test )?
- | lambdef
  ;
 
-/// test_nocond: or_test | lambdef_nocond
+/// test_nocond: or_test
 test_nocond
  : or_test
- | lambdef_nocond
- ;
-
-/// lambdef: 'lambda' [varargslist] ':' test
-lambdef
- : LAMBDA varargslist? ':' test
- ;
-
-/// lambdef_nocond: 'lambda' [varargslist] ':' test_nocond
-lambdef_nocond
- : LAMBDA varargslist? ':' test_nocond
  ;
 
 /// or_test: and_test ('or' and_test)*
@@ -792,7 +794,6 @@ TRY : 'try';
 FINALLY : 'finally';
 WITH : 'with';
 EXCEPT : 'except';
-LAMBDA : 'lambda';
 OR : 'or';
 AND : 'and';
 NOT : 'not';
