@@ -35,11 +35,13 @@ public final class ServicesGraph {
         JSONArray nodes = new JSONArray();
         JSONArray edges = new JSONArray();
         int edgesCounter = 0;
-        for (int i = 0; i < ServicesSymbolTable.keys().length; i++) {
+        for (int i = 0; i < ServicesSymbolTable.ids().length; i++) {
             JSONObject node = new JSONObject();
             JSONObject nodeData = new JSONObject();
             nodeData.put("id", String.valueOf(i));
-            nodeData.put("name", ServicesSymbolTable.getName(i));
+            String serviceName = ServicesSymbolTable.getName(i);
+            nodeData.put("name", serviceName);
+            nodeData.put("color", ServicesSymbolTable.get(serviceName).getColor());
             node.put("data", nodeData);
             nodes.put(i, node);
             for (int w : graph.adj(i)) {

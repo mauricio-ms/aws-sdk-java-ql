@@ -1,7 +1,10 @@
 
 <!-- saved from url=(0062)https://ivis-at-bilkent.github.io/cytoscape.js-avsdf/demo.html -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<style id="__________cytoscape_stylesheet">.__________cytoscape_container { position: relative; }</style><title>cytoscape-avsdf.js demo</title>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<style id="__________cytoscape_stylesheet">.__________cytoscape_container { position: relative; }</style>
+		<title>AWS Services Graph</title>
 
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
@@ -51,8 +54,17 @@
 				margin-left:25px;
 			}
 
-		</style>
+			.box {
+			  float: left;
+			}
 
+			.clearfix::after {
+			  content: "";
+			  clear: both;
+			  display: table;
+			}
+			</style>
+		</head>
 		<script>
 			document.addEventListener('DOMContentLoaded', function(){
 
@@ -74,8 +86,7 @@
 								'height': 60,
 								'width': 60,
 								'color': '#000000',
-								'background-color': '#3a7ecf'
-							
+								'background-color': 'data(color)'
 							}
 						},
 
@@ -97,15 +108,38 @@
 
 			});
 		</script>
-	</head>
 
-	<body>
-		<div id="cy" class=" __________cytoscape_container" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-			<div >
-				<canvas data-id="layer0-selectbox" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 3; width: 1263px; height: 503px;"></canvas>
-				<canvas data-id="layer1-drag" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 2; width: 1263px; height: 503px;"></canvas>
-				<canvas data-id="layer2-node" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 1; width: 1263px; height: 503px;"></canvas>
+		<body>
+			<div class="clearfix">
+				<!-- TODO Coupled with Java Code, could be generated automatically -->
+				<div class="box" style="width: 200px; height: 200px; border-style: solid; border-color: #333333">
+					<div style="margin: 20px">
+						<div style="width: 20px; height: 20px; border-style: solid; border-color: #333333; background-color: #b3b3b3">
+							<div style="margin-left: 30px; width: 100px">Service</div>
+						</div>
+						<br/>
+						<div style="width: 20px; height: 20px; border-style: solid; border-color: #333333; background-color: #ffa366">
+							<div style="margin-left: 30px; width: 100px">SNS Topic</div>
+						</div>
+						<br/>
+						<div style="width: 20px; height: 20px; border-style: solid; border-color: #333333; background-color: #b3ff66">
+							<div style="margin-left: 30px; width: 100px">SQS Queue</div>
+						</div>
+						<br/>
+						<div style="width: 20px; height: 20px; border-style: solid; border-color: #333333; background-color: #ff6666">
+							<div style="margin-left: 30px; width: 100px">Non Resolved</div>
+						</div>
+					</div>
+				</div>
+				<div class="box" style="width: 1100px; height: 800px">
+					<div id="cy" class=" __________cytoscape_container" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+						<div>
+							<canvas data-id="layer0-selectbox" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 3; width: 1263px; height: 503px;"></canvas>
+							<canvas data-id="layer1-drag" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 2; width: 1263px; height: 503px;"></canvas>
+							<canvas data-id="layer2-node" width="1263" height="503" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); outline-style: none; position: absolute; z-index: 1; width: 1263px; height: 503px;"></canvas>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-	</body>
+		</body>
 </html>

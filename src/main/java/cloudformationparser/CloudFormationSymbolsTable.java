@@ -201,23 +201,23 @@ public class CloudFormationSymbolsTable {
 
     public void populateGraph(String originService) {
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
-            ServicesSymbolTable.add((String) sqsQueueEntry.getValue().parameters().get("QueueName"));
+            ServicesSymbolTable.add((String) sqsQueueEntry.getValue().parameters().get("QueueName"), ServicesSymbolTable.Resource::sqsQueue);
         }
 
         for (var snsTopicEntry : snsTopicsTable.entrySet()) {
-            ServicesSymbolTable.add((String) snsTopicEntry.getValue().parameters().get("TopicName"));
+            ServicesSymbolTable.add((String) snsTopicEntry.getValue().parameters().get("TopicName"), ServicesSymbolTable.Resource::snsTopic);
         }
 
-        Integer currentServiceKey = ServicesSymbolTable.getKey(originService);
-        if (currentServiceKey == null) {
-            currentServiceKey = ServicesSymbolTable.add(originService);
+        Integer currentServiceId = ServicesSymbolTable.getId(originService);
+        if (currentServiceId == null) {
+            currentServiceId = ServicesSymbolTable.add(originService, ServicesSymbolTable.Resource::service);
         }
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
-            ServicesGraph.addEdge(currentServiceKey, ServicesSymbolTable.getKey((String) sqsQueueEntry.getValue().parameters().get("QueueName")));
+            ServicesGraph.addEdge(currentServiceId, ServicesSymbolTable.getId((String) sqsQueueEntry.getValue().parameters().get("QueueName")));
         }
 
         for (var snsTopicEntry : snsTopicsTable.entrySet()) {
-            ServicesGraph.addEdge(currentServiceKey, ServicesSymbolTable.getKey((String) snsTopicEntry.getValue().parameters().get("TopicName")));
+            ServicesGraph.addEdge(currentServiceId, ServicesSymbolTable.getId((String) snsTopicEntry.getValue().parameters().get("TopicName")));
         }
     }
 }
