@@ -47,20 +47,23 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     }
 
     @Override
+    public void enterAnnotation(JavaParser.AnnotationContext ctx) {
+        if ("SqsListener".equals(ctx.qualifiedName().getText())) {
+            classNode.addChild(new Node(requireAnnotationValue(ctx), Node.Type.SQS_LISTENER));
+        }
+    }
+
+    @Override
     public void enterMemberDeclaration(JavaParser.MemberDeclarationContext ctx) {
         var modifier = ctx.getParent().getChild(JavaParser.ModifierContext.class, 0);
         if (modifier != null) {
             var annotation = modifier.classOrInterfaceModifier().annotation();
-            if (annotation != null) {
-                switch (annotation.qualifiedName().getText()) {
-                    case "Value" -> snsVariableToTopicMap.put(ctx.fieldDeclaration().variableDeclarators().getText(), requireAnnotationValue(annotation));
-                    case "SqsListener" -> classNode.addChild(new Node(requireAnnotationValue(annotation), Node.Type.SQS_LISTENER));
-//                    case "SqsListener" -> graph.ServicesCommunicationGraph.add(requireAnnotationValue(annotation), nodeProject.value.toString());
-                }
+            if (annotation != null && "Value".equals(annotation.qualifiedName().getText())) {
+                snsVariableToTopicMap.put(ctx.fieldDeclaration().variableDeclarators().getText(), requireAnnotationValue(annotation));
             }
         }
     }
-
+    
     @Override
     public void enterFieldDeclaration(JavaParser.FieldDeclarationContext ctx) {
         var type = getType(ctx.typeType());
