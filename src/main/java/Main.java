@@ -1,12 +1,18 @@
-import cloudformationparser.*;
-import graph.*;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
+import cloudformationparser.CloudFormationSymbolsTable;
+import cloudformationparser.CloudFormationTemplateToSymbolsTable;
+import cloudformationparser.CloudFormationTreeGeneratorTool;
+import graph.Node;
+import graph.StdOut;
+import graph.TreeListener;
 import javaparser.CustomJavaParserListener;
 import javaparser.JavaLexer;
 import javaparser.JavaParser;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import services.DependenciesSymbolTable;
+import services.Infrastructure;
+import services.ServiceMetadata;
 import services.ServicesGraph;
 
 import java.io.FileInputStream;
@@ -24,21 +30,25 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-//        for (String projectPath : List.of(
-//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-chargebee"
-//        )) {
-        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp")).toList()) {
-            String projectPath = p.toString();
+        for (String projectPath : List.of(
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
+        )) {
+//        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp")).toList()) {
+//            String projectPath = p.toString();
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
+            ServiceMetadata.basePackage = null;
             String[] projectParts = projectPath.split("/");
             String project = projectParts[projectParts.length - 1];
             System.out.println(">> Analyzing project " + project);
 
-            Node nodeProject = new Node(project, Node.Type.PROJECT);
+            Infrastructure infrastructure = new Infrastructure(projectPath);
+            Node nodeProject = new Node(project, infrastructure.hasStackYaml() ? Node.Type.PROJECT : Node.Type.LIB);
             tree.addChild(nodeProject);
 
-            for (Path stackFilePath : getStacksFilesPath(projectPath)) {
+            for (Path stackFilePath : infrastructure.getStacksFilesPath()) {
                 boolean isStack = stackFilePath.endsWith("stack.yaml");
                 var cloudFormationSymbolTable = isStack ?
                         CloudFormationTreeGeneratorTool.parse(stackFilePath.toString()) : stackFilePath.toString();
@@ -73,7 +83,25 @@ public class Main {
 
 //        StdOut.println("Tree");
 //        tree.show();
-        tree.walk(new TreeListener(tree));
+
+        DependenciesSymbolTable.get()
+                .forEach((source, targets) -> {
+                    Node sourceNode = tree.find(source, Node.Type.CLASS);
+                    targets.forEach(target -> {
+                        Node targetNode = tree.find(target, Node.Type.CLASS);
+                        if (targetNode == null) {
+                            return;
+                        }
+                        if (sourceNode == null) {
+                            throw new RuntimeException("Node not added in the tree: " + source);
+                        }
+                        for (Node targetChild : targetNode.children) {
+                            sourceNode.addChild(targetChild);
+                        }
+                    });
+                });
+
+        tree.walk(new TreeListener(tree), Node.Type.LIB);
 
         StdOut.println("Graph");
         ServicesGraph.show();
@@ -107,7 +135,7 @@ public class Main {
     private static void processInnerStacks(Node tree, CloudFormationSymbolsTable cloudFormationSymbolsTable) throws IOException {
         for (var cloudFormationStack : cloudFormationSymbolsTable.getStacks()) {
             // find the CloudFormationSymbolsTable for the service
-            Node projectNode = tree.find("api-" + cloudFormationStack.getService(), Node.Type.PROJECT);
+            Node projectNode = tree.find("api-" + cloudFormationStack.getService());
             if (projectNode == null) {
                 continue;
             }
@@ -136,26 +164,6 @@ public class Main {
             ParseTreeWalker.DEFAULT.walk(listener, tree);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static List<Path> getStacksFilesPath(String projectPath) {
-        Path infrastructurePath = Path.of(projectPath, "infrastructure");
-        if (Files.notExists(infrastructurePath)) {
-            return List.of();
-        }
-        try (Stream<Path> stackFilesStream = Files.list(infrastructurePath)) {
-            List<Path> stackFilesPath = stackFilesStream
-                    .filter(p -> !p.getFileName().toString().startsWith(".") && p.getFileName().toString().endsWith(".yaml"))
-                    .toList();
-            if (stackFilesPath.isEmpty()) {
-                throw new RuntimeException("Stack file not found for project '" + projectPath + "'.");
-            } else if (stackFilesPath.size() > 2) {
-                throw new RuntimeException("infrastructure folder with unexpected content for project '" + projectPath + "'.");
-            }
-            return stackFilesPath;
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading the infrastructure folder for project" + projectPath + "': ", e);
         }
     }
 }

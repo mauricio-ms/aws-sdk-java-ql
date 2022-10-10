@@ -2,32 +2,46 @@ package javaparser;
 
 import graph.MethodCallNodeValue;
 import graph.Node;
+import services.DependenciesSymbolTable;
+import services.ServiceMetadata;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CustomJavaParserListener extends JavaParserBaseListener {
 
+    private String packageDeclaration;
+
+    private final Map<String, String> imports;
+
     private final Node nodeProject;
 
     private Node classNode;
 
-    private final List<String> notificationMessageTemplateVariables;
-
-    private final Map<String, String> snsVariableToTopicMap;
-
     public CustomJavaParserListener(Node nodeProject) {
+        imports = new HashMap<>();
         this.nodeProject = nodeProject;
-        notificationMessageTemplateVariables = new ArrayList<>();
-        snsVariableToTopicMap = new HashMap<>();
+    }
+
+    @Override
+    public void enterPackageDeclaration(JavaParser.PackageDeclarationContext ctx) {
+        packageDeclaration = ctx.qualifiedName().getText();
+        if (ServiceMetadata.basePackage == null) {
+            ServiceMetadata.basePackage = packageDeclaration;
+        }
+    }
+
+    @Override
+    public void enterImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
+        var qualifiedName = ctx.qualifiedName();
+        var identifiers = qualifiedName.identifier();
+        imports.put(identifiers.get(identifiers.size()-1).getText(), qualifiedName.getText());
     }
 
     @Override
     public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
-        classNode = new Node(ctx.identifier().getText(), Node.Type.CLASS);
-
+        classNode = new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS);
         if (ctx.IMPLEMENTS() != null) {
             Node joinNode = new Node(null, Node.Type.JOIN);
             for (var interfaceType : ctx.typeList()) {
@@ -38,6 +52,16 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
             joinNode.addChild(classNode);
         } else {
             nodeProject.addChild(classNode);
+        }
+
+        if (ctx.EXTENDS() != null) {
+            var baseType = ctx.typeType();
+            String baseTypeQualifiedName = imports.get(baseType.classOrInterfaceType().identifier(0).getText());
+            if (baseTypeQualifiedName != null) {
+                if (!ServiceMetadata.typeBelongsToService(baseTypeQualifiedName)) {
+                    DependenciesSymbolTable.add((String) classNode.value, baseTypeQualifiedName);
+                }
+            }
         }
     }
 
@@ -54,29 +78,47 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     }
 
     @Override
-    public void enterMemberDeclaration(JavaParser.MemberDeclarationContext ctx) {
-        var modifier = ctx.getParent().getChild(JavaParser.ModifierContext.class, 0);
-        if (modifier != null) {
-            var annotation = modifier.classOrInterfaceModifier().annotation();
-            if (annotation != null && "Value".equals(annotation.qualifiedName().getText())) {
-                snsVariableToTopicMap.put(ctx.fieldDeclaration().variableDeclarators().getText(), requireAnnotationValue(annotation));
-            }
+    public void enterClassBodyDeclaration(JavaParser.ClassBodyDeclarationContext ctx) {
+        var memberDeclaration = ctx.memberDeclaration();
+        if (memberDeclaration == null) {
+            return;
         }
-    }
-    
-    @Override
-    public void enterFieldDeclaration(JavaParser.FieldDeclarationContext ctx) {
-        var type = getType(ctx.typeType());
+        var fieldDeclaration = memberDeclaration.fieldDeclaration();
+        if (fieldDeclaration == null) {
+            return;
+        }
+
+        var type = getType(fieldDeclaration.typeType());
         Node fieldNode = classNode.find(type);
         if (fieldNode == null) {
             fieldNode = new Node(type, Node.Type.INSTANCE_VARIABLE_TYPE);
             classNode.addChild(fieldNode);
         }
-        fieldNode.addChild(new Node(ctx.variableDeclarators().getText(), Node.Type.INSTANCE_VARIABLE_DECLARATION));
-
-        if ("NotificationMessagingTemplate".equals(type)) {
-            notificationMessageTemplateVariables.add(ctx.variableDeclarators().getText());
+        Node instanceVariableNode = new Node(fieldDeclaration.variableDeclarators().getText(), Node.Type.INSTANCE_VARIABLE_DECLARATION);
+        fieldNode.addChild(instanceVariableNode);
+        Node valueAnnotationNode = getValueAnnotationNode(ctx.modifier());
+        if (valueAnnotationNode != null) {
+            instanceVariableNode.addChild(valueAnnotationNode);
         }
+    }
+
+    private Node getValueAnnotationNode(List<JavaParser.ModifierContext> modifiers) {
+        if (modifiers == null) {
+            return null;
+        }
+
+        for (var modifier : modifiers) {
+            var classOrInterfaceModifier = modifier.classOrInterfaceModifier();
+            if (classOrInterfaceModifier == null) {
+                continue;
+            }
+            var annotation = classOrInterfaceModifier.annotation();
+            if (annotation != null && "Value".equals(annotation.qualifiedName().getText())) {
+                return new Node(requireAnnotationValue(annotation), Node.Type.VALUE_ANNOTATION);
+            }
+        }
+
+        return null;
     }
 
     private String getType(JavaParser.TypeTypeContext ctx) {
@@ -97,7 +139,6 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
                 // The formal parameter being analyzed can be a @Value parameter that is not an instance variable
                 if (instanceVariableNode != null) {
                     instanceVariableNode.addChild(new Node(requireAnnotationValue(annotation), Node.Type.VALUE_ANNOTATION));
-                    snsVariableToTopicMap.put(ctx.variableDeclaratorId().getText(), requireAnnotationValue(annotation));
                 }
             }
         }
@@ -107,25 +148,37 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     public void enterMethodCall(JavaParser.MethodCallContext ctx) {
         String caller = ctx.getParent().getChild(0).getText();
         Node nodeCaller = nodeProject.find(caller);
-        if (nodeCaller != null && nodeCaller.parent.value.equals("NotificationMessagingTemplate")) {
-            Node nodeSnsSender = new Node(ctx.identifier().getText(), Node.Type.SNS_SENDER);
-            nodeCaller.addChild(nodeSnsSender);
-            var arguments = ctx.expressionList();
-            if (arguments != null) {
-                var firstArgument = arguments.expression(0);
-                var methodCall = firstArgument.methodCall();
-                if (methodCall != null) {
-                    var propertiesMethodCall = removeGetJavaBean(methodCall.identifier().getText());
-                    var propertiesMethodCaller = firstArgument.expression(0).getText();
-                    nodeSnsSender.addChild(new Node(new MethodCallNodeValue(propertiesMethodCaller, propertiesMethodCall), Node.Type.METHOD_CALL));
-                } else {
-                    nodeSnsSender.addChild(new Node(firstArgument.getText(), Node.Type.INSTANCE_VARIABLE_ID));
-                }
+        Node.Type messagingNodeType = getMessagingNodeType(nodeCaller);
+        if (messagingNodeType == null) {
+            return;
+        }
+
+        Node messagingNode = new Node(ctx.identifier().getText(), messagingNodeType);
+        nodeCaller.addChild(messagingNode);
+        var arguments = ctx.expressionList();
+        if (arguments != null) {
+            var firstArgument = arguments.expression(0);
+            var methodCall = firstArgument.methodCall();
+            if (methodCall != null) {
+                var propertiesMethodCall = removeGetJavaBean(methodCall.identifier().getText());
+                var propertiesMethodCaller = firstArgument.expression(0).getText();
+                messagingNode.addChild(new Node(new MethodCallNodeValue(propertiesMethodCaller, propertiesMethodCall), Node.Type.METHOD_CALL));
+            } else {
+                messagingNode.addChild(new Node(firstArgument.getText(), Node.Type.INSTANCE_VARIABLE_ID));
             }
         }
-        if (notificationMessageTemplateVariables.contains(caller)) {
-            snsSendNotification(ctx);
+    }
+
+    private Node.Type getMessagingNodeType(Node nodeCaller) {
+        if (nodeCaller == null) {
+            return null;
         }
+
+        return switch ((String) nodeCaller.parent.value) {
+            case "QueueMessagingTemplate" -> Node.Type.SQS_SENDER;
+            case "NotificationMessagingTemplate" -> Node.Type.SNS_SENDER;
+            default -> null;
+        };
     }
 
     private String removeGetJavaBean(String methodCall) {
@@ -134,17 +187,6 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
             return Character.toLowerCase(substring.charAt(0)) + substring.substring(1);
         }
         return methodCall;
-    }
-
-    private void snsSendNotification(JavaParser.MethodCallContext ctx) {
-        var arguments = ctx.expressionList();
-        var firstArgument = arguments.expression(0);
-        String snsTopic = snsVariableToTopicMap.get(firstArgument.getText());
-        if (snsTopic == null) {
-//            throw new RuntimeException("Unknown 'NotificationMessageTemplate' API utilization. Check for updates javadoc.io.");
-        } else {
-//            graph.ServicesCommunicationGraph.add(nodeProject.value.toString(), snsTopic);
-        }
     }
 
     private String requireAnnotationValue(JavaParser.AnnotationContext ctx) {

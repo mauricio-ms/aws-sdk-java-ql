@@ -22,3 +22,9 @@ java -cp target/java-ast-generator-1.0-SNAPSHOT-jar-with-dependencies.jar src/ma
 
 # Pass projects via pipe
 ls -d ~/development/aws-sdk-java-ql/beatstars/projects_tmp/* | <command>
+
+# To Do
+[] - If a message is sent to SQS or SNS, but the code is not reachable,
+this can be reported but should not be considered in the communication graph
+[] - Add value to the edge to identify if the communication is defined in Stack but never used (i.e., edge with value 0)
+    If the edge not exists it can be reported that resource was created manually

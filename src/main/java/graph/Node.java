@@ -1,6 +1,7 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -23,21 +24,21 @@ public class Node {
     }
 
     public enum Type {
-        CLOUD_FORMATION_STACK_SYMBOLS_TABLE(-2),
-        CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE(-1),
-        PROJECT(0),
-        INTERFACE(1),
-        CLASS(2),
-        INSTANCE_VARIABLE_TYPE(3),
-
-        INSTANCE_VARIABLE_DECLARATION(4),
-        INSTANCE_VARIABLE_ID(5),
-        METHOD_CALL(6),
-        VALUE_ANNOTATION(7),
-        SQS_LISTENER(8),
-        SQS_SENDER(9),
-        SNS_SENDER(10),
-        JOIN(11);
+        CLOUD_FORMATION_STACK_SYMBOLS_TABLE(0),
+        CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE(1),
+        PROJECT(2),
+        LIB(3),
+        INTERFACE(4),
+        CLASS(5),
+        INSTANCE_VARIABLE_TYPE(6),
+        INSTANCE_VARIABLE_DECLARATION(7),
+        INSTANCE_VARIABLE_ID(8),
+        METHOD_CALL(9),
+        VALUE_ANNOTATION(10),
+        SQS_LISTENER(11),
+        SQS_SENDER(12),
+        SNS_SENDER(13),
+        JOIN(14);
 
         private final int value;
 
@@ -122,15 +123,17 @@ public class Node {
         return null;
     }
 
-    public void walk(Consumer<Node> listener) {
-        walkRec(this, listener);
+    public void walk(Consumer<Node> listener, Node.Type... typesToSkip) {
+        walkRec(this, Arrays.stream(typesToSkip).toList(), listener);
     }
 
-    private void walkRec(Node node, Consumer<Node> listener) {
+    private void walkRec(Node node, List<Node.Type> typesToSkip, Consumer<Node> listener) {
         listener.accept(node);
 
         for (Node child : node.children) {
-            walkRec(child, listener);
+            if (!typesToSkip.contains(child.type)) {
+                walkRec(child, typesToSkip, listener);
+            }
         }
     }
 

@@ -39,7 +39,7 @@ public class TreeListener implements Consumer<Node> {
                     ServicesGraph.addEdge(keyNotResolvedParameter, ServicesSymbolTable.getId(currentProjectNode.value.toString()));
                 }
             }
-            case SNS_SENDER -> {
+            case SQS_SENDER, SNS_SENDER -> {
                 Node child = node.children.get(0);
                 switch (child.type) {
                     case METHOD_CALL -> {
@@ -47,18 +47,30 @@ public class TreeListener implements Consumer<Node> {
                         Node propertiesVariableNode = currentProjectNode.find(methodCallNodeValue.caller).parent;
                         Node propertiesNode = currentProjectNode.find(propertiesVariableNode.value, Node.Type.INTERFACE);
                         Node propertiesImplNode = propertiesNode.findUnique(Node.Type.CLASS);
-                        String snsTopic = (String) propertiesImplNode.find(methodCallNodeValue.call).children.get(0).value;
-                        String targetResource = resolveResource(snsTopic);
-                        System.out.printf("SNS_SENDER::METHOD_CALL: %s -> %s\n", currentProjectNode.value, targetResource);
-                        ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(targetResource));
+                        String destination = (String) propertiesImplNode.find(methodCallNodeValue.call).children.get(0).value;
+                        String destinationResource = resolveResource(destination);
+                        if (destinationResource != null) {
+                            System.out.printf("MESSAGING_SENDER::METHOD_CALL: %s -> %s\n", currentProjectNode.value, destinationResource);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource));
+                        } else {
+                            System.out.println("Parameter not resolved: " + destination);
+                            Integer keyNotResolvedParameter = ServicesSymbolTable.add(destination, ServicesSymbolTable.Resource::nonResolved);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter);
+                        }
                     }
                     case INSTANCE_VARIABLE_ID -> {
                         String variableId = (String) child.value;
                         Node variableDeclarationNode = currentProjectNode.find(variableId, Node.Type.INSTANCE_VARIABLE_DECLARATION);
-                        String snsTopic = (String) variableDeclarationNode.children.get(0).value;
-                        String targetResource = resolveResource(snsTopic);
-                        System.out.printf("SNS_SENDER::INSTANCE_VARIABLE_ID: %s -> (%s:%s)\n", currentProjectNode.value, snsTopic, targetResource);
-                        ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(targetResource));
+                        String destination = (String) variableDeclarationNode.children.get(0).value;
+                        String destinationResource = resolveResource(destination);
+                        if (destinationResource != null) {
+                            System.out.printf("MESSAGING_SENDER::INSTANCE_VARIABLE_ID: %s -> (%s:%s)\n", currentProjectNode.value, destination, destinationResource);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource));
+                        } else {
+                            System.out.println("Parameter not resolved: " + destination);
+                            Integer keyNotResolvedParameter = ServicesSymbolTable.add(destination, ServicesSymbolTable.Resource::nonResolved);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter);
+                        }
                     }
                 }
             }
@@ -69,8 +81,7 @@ public class TreeListener implements Consumer<Node> {
         boolean isParameter = resource.startsWith("${") && resource.endsWith("}");
         if (isParameter) {
             try {
-                return resolveParameter(currentProjectNode, resource.substring(2, resource.length()-1));
-//                return GetAwsParameter.get("/config/application_dev/" + resource.substring(2, resource.length()-1));
+                return resolveParameter(root, resource.substring(2, resource.length() - 1));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -88,7 +99,7 @@ public class TreeListener implements Consumer<Node> {
 
             for (CloudFormationSymbolsTable.CloudFormationStack stack : cloudFormationSymbolsTable.getStacks()) {
                 // Node node findNode for stack.service
-                Node stackNode = root.find("api-" + stack.getService(), Node.Type.PROJECT);
+                Node stackNode = root.find("api-" + stack.getService());
                 if (stackNode == null) {
                     continue;
                 }
