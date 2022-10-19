@@ -1,22 +1,16 @@
 package graph;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Graph {
 
     private final int v;
 
     private int e;
 
-    private List<Integer>[] adj;
+    private final Integer[][] adj;
 
     public Graph(int v) {
         this.v = v;
-        adj = new ArrayList[v];
-        for (int i = 0; i < v; i++) {
-            adj[i] = new ArrayList<>();
-        }
+        adj = new Integer[v][v];
     }
 
     public int v() {
@@ -28,11 +22,19 @@ public class Graph {
     }
 
     public void addEdge(int v, int w) {
-        adj[v].add(w);
+        addEdge(v, w, 0);
+    }
+
+    public void addEdge(int v, int w, int defaultValue) {
+        if (adj[v][w] == null) {
+            adj[v][w] = defaultValue;
+        } else {
+            adj[v][w]++;
+        }
         e++;
     }
 
-    public Iterable<Integer> adj(int v) {
+    public Integer[] adj(int v) {
         return adj[v];
     }
 
@@ -41,8 +43,11 @@ public class Graph {
         String s = v + " vertices, " + e + " edges\n";
         for (int i = 0; i < v; i++) {
             s += i + ": ";
-            for (int w : adj(i)) {
-                s += w + " ";
+            Integer[] w = adj(i);
+            for (int j = 0; j < w.length; j++) {
+                if (w[j] != null) {
+                    s += j + " ";
+                }
             }
             s += "\n";
         }

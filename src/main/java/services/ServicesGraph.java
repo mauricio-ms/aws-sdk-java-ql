@@ -12,7 +12,11 @@ public final class ServicesGraph {
     }
 
     public static void addEdge(int sourceServiceKey, int targetServiceKey) {
-        graph.addEdge(sourceServiceKey, targetServiceKey);
+        addEdge(sourceServiceKey, targetServiceKey, 0);
+    }
+
+    public static void addEdge(int sourceServiceKey, int targetServiceKey, int defaultValue) {
+        graph.addEdge(sourceServiceKey, targetServiceKey, defaultValue);
     }
 
     public static Graph get() {
@@ -23,8 +27,11 @@ public final class ServicesGraph {
         String s = graph.v() + " vertices, " + graph.e() + " edges\n";
         for (int i = 0; i < ServicesSymbolTable.getCounter(); i++) {
             s += ServicesSymbolTable.getName(i) + ": ";
-            for (int w : graph.adj(i)) {
-                s += ServicesSymbolTable.getName(w) + " ";
+            Integer[] w = graph.adj(i);
+            for (int j = 0; j < w.length; j++) {
+                if (w[j] != null) {
+                    s += ServicesSymbolTable.getName(j) + " ";
+                }
             }
             s += "\n";
         }
@@ -44,13 +51,17 @@ public final class ServicesGraph {
             nodeData.put("color", ServicesSymbolTable.get(serviceName).getColor());
             node.put("data", nodeData);
             nodes.put(i, node);
-            for (int w : graph.adj(i)) {
-                JSONObject edge = new JSONObject();
-                JSONObject edgeData = new JSONObject();
-                edgeData.put("source", String.valueOf(i));
-                edgeData.put("target", String.valueOf(w));
-                edge.put("data", edgeData);
-                edges.put(edgesCounter++, edge);
+            Integer[] w = graph.adj(i);
+            for (int j = 0; j < w.length; j++) {
+                if (w[j] != null) {
+                    JSONObject edge = new JSONObject();
+                    JSONObject edgeData = new JSONObject();
+                    edgeData.put("source", String.valueOf(i));
+                    edgeData.put("target", String.valueOf(j));
+                    edgeData.put("label", String.valueOf(w[j]));
+                    edge.put("data", edgeData);
+                    edges.put(edgesCounter++, edge);
+                }
             }
         }
 

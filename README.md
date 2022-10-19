@@ -28,3 +28,4 @@ ls -d ~/development/aws-sdk-java-ql/beatstars/projects_tmp/* | <command>
 this can be reported but should not be considered in the communication graph
 [] - Add value to the edge to identify if the communication is defined in Stack but never used (i.e., edge with value 0)
     If the edge not exists it can be reported that resource was created manually
+[] - Check who uses the AsyncClient to use as example to make the system detect it
