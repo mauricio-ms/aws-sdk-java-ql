@@ -29,3 +29,7 @@ this can be reported but should not be considered in the communication graph
 [] - Add value to the edge to identify if the communication is defined in Stack but never used (i.e., edge with value 0)
     If the edge not exists it can be reported that resource was created manually
 [] - Check who uses the AsyncClient to use as example to make the system detect it
+
+# Ideas
+- Check cycles between messaging endpoints analyzing all the code paths
+- From a given resource (for example, a specific HTTP request), answers with the possible paths that the request can follow (another HTTP requests or notification messages via SQS/SNS)

@@ -1,9 +1,7 @@
 import cloudformationparser.CloudFormationSymbolsTable;
 import cloudformationparser.CloudFormationTemplateToSymbolsTable;
 import cloudformationparser.CloudFormationTreeGeneratorTool;
-import graph.Node;
-import graph.StdOut;
-import graph.TreeListener;
+import graph.*;
 import javaparser.CustomJavaParserListener;
 import javaparser.JavaLexer;
 import javaparser.JavaParser;
@@ -30,13 +28,13 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-        for (String projectPath : List.of(
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
-        )) {
-//        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp")).toList()) {
-//            String projectPath = p.toString();
+//        for (String projectPath : List.of(
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
+//        )) {
+        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced")).toList()) {
+            String projectPath = p.toString();
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
             ServiceMetadata.basePackage = null;
@@ -95,12 +93,19 @@ public class Main {
                         if (sourceNode == null) {
                             throw new RuntimeException("Node not added in the tree: " + source);
                         }
-                        for (Node targetChild : targetNode.children) {
-                            sourceNode.addChild(targetChild);
+
+                        Node projectSourceNode = sourceNode.parent;
+                        targetNode.addChild(sourceNode);
+                        while (targetNode.parent.type == Node.Type.CLASS || targetNode.parent.type == Node.Type.INTERFACE) {
+                            targetNode = targetNode.parent;
                         }
+                        projectSourceNode.removeChild(sourceNode);
+                        projectSourceNode.addChild(targetNode);
                     });
                 });
 
+        new MethodEvaluator(tree, "com.beatstars.inventory.album.service.album.ClientService", new MethodCallNodeValue("propertiesService", "getSnsTopic"))
+                .evaluate();
         tree.walk(new TreeListener(tree), Node.Type.LIB);
 
         StdOut.println("Graph");

@@ -30,15 +30,17 @@ public class Node {
         LIB(3),
         INTERFACE(4),
         CLASS(5),
-        INSTANCE_VARIABLE_TYPE(6),
-        INSTANCE_VARIABLE_DECLARATION(7),
-        INSTANCE_VARIABLE_ID(8),
-        METHOD_CALL(9),
-        VALUE_ANNOTATION(10),
-        SQS_LISTENER(11),
-        SQS_SENDER(12),
-        SNS_SENDER(13),
-        JOIN(14);
+        CONSTRUCTOR(6),
+        INSTANCE_VARIABLE_TYPE(7),
+        INSTANCE_VARIABLE_DECLARATION(8),
+        INSTANCE_VARIABLE_ID(9),
+        METHOD_CALL(10),
+        METHOD_DECLARATION(11),
+        RETURN_EXPRESSION(12),
+        VALUE_ANNOTATION(13),
+        SQS_LISTENER(14),
+        SQS_SENDER(15),
+        SNS_SENDER(16);
 
         private final int value;
 
@@ -54,37 +56,53 @@ public class Node {
         }
     }
 
+    public Node root() {
+        Node temp = this;
+        while (temp.parent != null) {
+            temp = temp.parent;
+        }
+        return temp;
+    }
+
     public void addChild(Node child) {
         children.add(child);
-        if (this.type == Type.JOIN) {
-            child.parent = this.parent;
-        } else {
-            child.parent = this;
-        }
+        child.parent = this;
     }
 
-    public Node find(Object value) {
-        return findRec(this, value);
+    public void removeChild(Node child) {
+        children.remove(child);
     }
 
-    private Node findRec(Node current, Object value) {
-        if (value.equals(current.value)) {
-            return current;
-        }
-
-        for (Node child : current.children) {
-            Node found = findRec(child, value);
-            if (found != null) {
-                return found;
+    public Node findUpwards(Node.Type... types) {
+        List<Type> typesList = Arrays.stream(types).toList();
+        Node temp = this;
+        while (temp != null) {
+            if (typesList.contains(temp.type)) {
+                return temp;
             }
+            temp = temp.parent;
         }
-
         return null;
     }
 
-    public Node findUnique(Node.Type type) {
-        List<Node> nodes = find(type);
-        return !nodes.isEmpty() ? nodes.get(0) : null;
+    public Node findUnique(Node.Type... types) {
+        for (Node.Type type : types) {
+            List<Node> nodes = find(type);
+            if (!nodes.isEmpty()) {
+                return nodes.get(0);
+            }
+        }
+        return null;
+    }
+
+    public Node getChild(Node.Type... types) {
+        List<Type> typesList = Arrays.stream(types).toList();
+        for (Node child : children) {
+            if (typesList.contains(child.type)) {
+                return child;
+            }
+        }
+        return null;
     }
 
     public List<Node> find(Node.Type type) {
@@ -104,17 +122,17 @@ public class Node {
         return nodes;
     }
 
-    public Node find(Object value, Node.Type type) {
-        return findRec(this, value, type);
+    public Node find(Object value, Node.Type... types) {
+        return findRec(this, value, List.of(types));
     }
 
-    private Node findRec(Node current, Object value, Node.Type type) {
-        if (value.equals(current.value) && type.equals(current.type)) {
+    private Node findRec(Node current, Object value, List<Node.Type> types) {
+        if (value.equals(current.value) && (types.isEmpty() || types.contains(current.type))) {
             return current;
         }
 
         for (Node child : current.children) {
-            Node found = findRec(child, value, type);
+            Node found = findRec(child, value, types);
             if (found != null) {
                 return found;
             }
@@ -155,5 +173,10 @@ public class Node {
                 showRec(child, tabs);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return type + ":" + value;
     }
 }

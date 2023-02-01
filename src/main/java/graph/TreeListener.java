@@ -32,11 +32,11 @@ public class TreeListener implements Consumer<Node> {
                 String sourceService = resolveResource(node.value.toString());
                 if (sourceService != null) {
                     System.out.printf("SQS_LISTENER: %s -> %s\n", sourceService, currentProjectNode.value);
-                    ServicesGraph.addEdge(ServicesSymbolTable.getId(sourceService), ServicesSymbolTable.getId(currentProjectNode.value.toString()));
+                    ServicesGraph.addEdge(ServicesSymbolTable.getId(sourceService), ServicesSymbolTable.getId(currentProjectNode.value.toString()), 1);
                 } else {
                     System.out.println("Parameter not resolved: " + node.value);
                     Integer keyNotResolvedParameter = ServicesSymbolTable.add(node.value.toString(), ServicesSymbolTable.Resource::nonResolved);
-                    ServicesGraph.addEdge(keyNotResolvedParameter, ServicesSymbolTable.getId(currentProjectNode.value.toString()));
+                    ServicesGraph.addEdge(keyNotResolvedParameter, ServicesSymbolTable.getId(currentProjectNode.value.toString()), 1);
                 }
             }
             case SQS_SENDER, SNS_SENDER -> {
@@ -45,17 +45,17 @@ public class TreeListener implements Consumer<Node> {
                     case METHOD_CALL -> {
                         MethodCallNodeValue methodCallNodeValue = (MethodCallNodeValue) child.value;
                         Node propertiesVariableNode = currentProjectNode.find(methodCallNodeValue.caller).parent;
-                        Node propertiesNode = currentProjectNode.find(propertiesVariableNode.value, Node.Type.INTERFACE);
-                        Node propertiesImplNode = propertiesNode.findUnique(Node.Type.CLASS);
+                        Node propertiesNode = currentProjectNode.find(propertiesVariableNode.value, Node.Type.INSTANCE_VARIABLE_TYPE);
+                        Node propertiesImplNode = propertiesNode.findUnique(Node.Type.INSTANCE_VARIABLE_DECLARATION);
                         String destination = (String) propertiesImplNode.find(methodCallNodeValue.call).children.get(0).value;
                         String destinationResource = resolveResource(destination);
                         if (destinationResource != null) {
                             System.out.printf("MESSAGING_SENDER::METHOD_CALL: %s -> %s\n", currentProjectNode.value, destinationResource);
-                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource));
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource), 1);
                         } else {
                             System.out.println("Parameter not resolved: " + destination);
                             Integer keyNotResolvedParameter = ServicesSymbolTable.add(destination, ServicesSymbolTable.Resource::nonResolved);
-                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter, 1);
                         }
                     }
                     case INSTANCE_VARIABLE_ID -> {
@@ -65,11 +65,11 @@ public class TreeListener implements Consumer<Node> {
                         String destinationResource = resolveResource(destination);
                         if (destinationResource != null) {
                             System.out.printf("MESSAGING_SENDER::INSTANCE_VARIABLE_ID: %s -> (%s:%s)\n", currentProjectNode.value, destination, destinationResource);
-                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource));
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), ServicesSymbolTable.getId(destinationResource), 1);
                         } else {
                             System.out.println("Parameter not resolved: " + destination);
                             Integer keyNotResolvedParameter = ServicesSymbolTable.add(destination, ServicesSymbolTable.Resource::nonResolved);
-                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter);
+                            ServicesGraph.addEdge(ServicesSymbolTable.getId(currentProjectNode.value.toString()), keyNotResolvedParameter, 1);
                         }
                     }
                 }
