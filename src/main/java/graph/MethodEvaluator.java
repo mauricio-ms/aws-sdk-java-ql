@@ -14,55 +14,65 @@ public class MethodEvaluator {
         this.methodCallNodeValue = methodCallNodeValue;
     }
 
-    public void evaluate() {
+    public String evaluate() {
         Node sourceClassNode = tree.find(sourceClass, Node.Type.CLASS);
         Node callerIdNode = sourceClassNode.find(methodCallNodeValue.caller, Node.Type.INSTANCE_VARIABLE_DECLARATION);
         Node callerTypeNode = callerIdNode.parent;
         if (callerTypeNode.type != Node.Type.INSTANCE_VARIABLE_TYPE) {
             throw new RuntimeException("Unexpected node type");
         }
-        // FIXME package hardcoded
-        Node callerClassNode = tree.find("com.beatstars.inventory.common.service." + callerTypeNode.value, Node.Type.INTERFACE, Node.Type.CLASS);
-        evaluateFromCaller(sourceClassNode, callerClassNode);
+        String qualifiedClassName = qualifiedClassName(sourceClassNode, (String) callerTypeNode.value);
+        Node callerClassNode = tree.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS);
+        return evaluateFromCaller(sourceClassNode, callerClassNode);
     }
 
-    private void evaluateFromCaller(Node sourceClassNode, Node callerClassNode) {
-        System.out.println(callerClassNode);
-        Node methodCallNode = tree.find(methodCallNodeValue, Node.Type.METHOD_CALL);
-        System.out.println(methodCallNode);
+    private String qualifiedClassName(Node sourceClassNode, String simpleClassName) {
+        Node importDeclarationNode = sourceClassNode.find(simpleClassName, Node.Type.IMPORT_DECLARATION);
+        if (importDeclarationNode != null) {
+            return (String) importDeclarationNode.value;
+        }
+        String sourceClassFullyQualifiedName = (String) sourceClassNode.value;
+        String sourceClassPackage = sourceClassFullyQualifiedName.substring(0, sourceClassFullyQualifiedName.lastIndexOf("."));
+        return sourceClassPackage + "." + simpleClassName;
+    }
+
+    private String evaluateFromCaller(Node sourceClassNode, Node callerClassNode) {
         Node implementor = implementor(callerClassNode);
-        System.out.println(implementor);
+        if (implementor == null) {
+            throw new RuntimeException("Implementor not found");
+        }
+
         Node methodDeclarationNode = implementor.find(methodCallNodeValue.call, Node.Type.METHOD_DECLARATION);
-        System.out.println(methodDeclarationNode);
         String returnExpression = (String) methodDeclarationNode.findUnique(Node.Type.RETURN_EXPRESSION).value;
         Node instanceVariableOwner = instanceVariableOwner(returnExpression, implementor);
-        System.out.println(instanceVariableOwner);
-        String evaluatedInstanceVariable = evaluateInstanceVariable(returnExpression, instanceVariableOwner);
-        System.out.println(evaluatedInstanceVariable);
-        boolean isSsmParameter = evaluatedInstanceVariable.startsWith("${") && evaluatedInstanceVariable.endsWith("}");
-        if (isSsmParameter) {
-            SsmParameter ssmParameter = new SsmParameter(sourceClassNode.findUpwards(Node.Type.PROJECT, Node.Type.LIB), evaluatedInstanceVariable);
-            String ssmParameterValue = ssmParameter.resolve();
-            // FIXME TO WORKS, THE INVENTORY CLIENT HAS TO BE PROCESSED AS THE REAL STACK FILES
-            System.out.println(ssmParameterValue);
+        if (instanceVariableOwner == null) {
+            throw new RuntimeException("InstanceVariable owner not found");
         }
+
+        String evaluatedInstanceVariable = evaluateInstanceVariable(returnExpression, instanceVariableOwner);
+        if (evaluatedInstanceVariable == null) {
+            throw new RuntimeException("The instance variable '" + returnExpression + "' could not be evaluated for the node " + instanceVariableOwner);
+        }
+        return evaluatedInstanceVariable;
     }
 
-    private String evaluateInstanceVariable(String instanceVariableId, Node currentNode) {
-        Node constructorNode = currentNode.getChild(Node.Type.CONSTRUCTOR);
-        ConstructorNodeValue constructorNodeValue = (ConstructorNodeValue) constructorNode.value;
-        Evaluable parameter = constructorNodeValue.get(instanceVariableId);
-        String parameterEvaluated = parameter.evaluate();
-        if (!parameterEvaluated.equals(instanceVariableId)) {
-            return parameterEvaluated;
-        } else {
-            Node subClassNode = currentNode.getChild(Node.Type.INTERFACE, Node.Type.CLASS);
-            if (subClassNode != null) {
-                return evaluateInstanceVariable(instanceVariableId, subClassNode);
-            } else {
-                return null;
+    private Node implementor(Node currentNode) {
+        if (currentNode.value.equals(methodCallNodeValue.call)) {
+            Node targetNode = currentNode;
+            while (targetNode.parent.type != Node.Type.CLASS && targetNode.parent.type != Node.Type.INTERFACE) {
+                targetNode = targetNode.parent;
+            }
+            return targetNode.parent;
+        }
+
+        for (Node child : currentNode.children) {
+            Node found = implementor(child);
+            if (found != null) {
+                return found;
             }
         }
+
+        return null;
     }
 
     private Node instanceVariableOwner(String instanceVariableId, Node currentNode) {
@@ -84,22 +94,20 @@ public class MethodEvaluator {
         return null;
     }
 
-    private Node implementor(Node currentNode) {
-        if (currentNode.value.equals(methodCallNodeValue.call)) {
-            Node targetNode = currentNode;
-            while (targetNode.parent.type != Node.Type.CLASS && targetNode.parent.type != Node.Type.INTERFACE) {
-                targetNode = targetNode.parent;
+    private String evaluateInstanceVariable(String instanceVariableId, Node currentNode) {
+        Node constructorNode = currentNode.getChild(Node.Type.CONSTRUCTOR);
+        ConstructorNodeValue constructorNodeValue = (ConstructorNodeValue) constructorNode.value;
+        Evaluable parameter = constructorNodeValue.get(instanceVariableId);
+        String parameterEvaluated = parameter.evaluate();
+        if (!parameterEvaluated.equals(instanceVariableId)) {
+            return parameterEvaluated;
+        } else {
+            Node subClassNode = currentNode.getChild(Node.Type.INTERFACE, Node.Type.CLASS);
+            if (subClassNode != null) {
+                return evaluateInstanceVariable(instanceVariableId, subClassNode);
+            } else {
+                return null;
             }
-            return targetNode.parent;
         }
-
-        for (Node child : currentNode.children) {
-            Node found = implementor(child);
-            if (found != null) {
-                return found;
-            }
-        }
-
-        return null;
     }
 }

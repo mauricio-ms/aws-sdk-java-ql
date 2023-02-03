@@ -10,14 +10,25 @@ public class Node {
 
     public Node parent;
 
+    public Object id;
+
     public Object value;
 
     public Type type;
 
     public List<Node> children;
 
+    public Node(Object id, Object value, Type type) {
+        parent = null;
+        this.id = id;
+        this.value = value;
+        this.type = type;
+        children = new ArrayList<>();
+    }
+
     public Node(Object value, Type type) {
         parent = null;
+        id = value;
         this.value = value;
         this.type = type;
         children = new ArrayList<>();
@@ -28,19 +39,20 @@ public class Node {
         CLOUD_FORMATION_CLIENT_SYMBOLS_TABLE(1),
         PROJECT(2),
         LIB(3),
-        INTERFACE(4),
-        CLASS(5),
-        CONSTRUCTOR(6),
-        INSTANCE_VARIABLE_TYPE(7),
-        INSTANCE_VARIABLE_DECLARATION(8),
-        INSTANCE_VARIABLE_ID(9),
-        METHOD_CALL(10),
-        METHOD_DECLARATION(11),
-        RETURN_EXPRESSION(12),
-        VALUE_ANNOTATION(13),
-        SQS_LISTENER(14),
-        SQS_SENDER(15),
-        SNS_SENDER(16);
+        IMPORT_DECLARATION(4),
+        INTERFACE(5),
+        CLASS(6),
+        CONSTRUCTOR(7),
+        INSTANCE_VARIABLE_TYPE(8),
+        INSTANCE_VARIABLE_DECLARATION(9),
+        INSTANCE_VARIABLE_ID(10),
+        METHOD_CALL(11),
+        METHOD_DECLARATION(12),
+        RETURN_EXPRESSION(13),
+        VALUE_ANNOTATION(14),
+        SQS_LISTENER(15),
+        SQS_SENDER(16),
+        SNS_SENDER(17);
 
         private final int value;
 
@@ -122,17 +134,17 @@ public class Node {
         return nodes;
     }
 
-    public Node find(Object value, Node.Type... types) {
-        return findRec(this, value, List.of(types));
+    public Node find(Object id, Node.Type... types) {
+        return findRec(this, id, List.of(types));
     }
 
-    private Node findRec(Node current, Object value, List<Node.Type> types) {
-        if (value.equals(current.value) && (types.isEmpty() || types.contains(current.type))) {
+    private Node findRec(Node current, Object id, List<Node.Type> types) {
+        if (id.equals(current.id) && (types.isEmpty() || types.contains(current.type))) {
             return current;
         }
 
         for (Node child : current.children) {
-            Node found = findRec(child, value, types);
+            Node found = findRec(child, id, types);
             if (found != null) {
                 return found;
             }
@@ -177,6 +189,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return type + ":" + value;
+        return type + "#" + id + ":" + value;
     }
 }

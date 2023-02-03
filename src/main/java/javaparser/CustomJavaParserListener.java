@@ -20,15 +20,12 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     private final Map<String, String> imports;
 
-    private final Map<String, String> instanceVariables;
-
     private final Node nodeProject;
 
     private String qualifiedClassName;
 
     public CustomJavaParserListener(Node nodeProject) {
         imports = new HashMap<>();
-        instanceVariables = new HashMap<>();
         this.nodeProject = nodeProject;
     }
 
@@ -54,22 +51,28 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     @Override
     public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
+        System.out.println("enterClassDeclaration=" + ctx.getText());
         qualifiedClassName = packageDeclaration + "." + ctx.identifier().getText();
+        System.out.println(qualifiedClassName);
         Node classNode = new Node(qualifiedClassName, Node.Type.CLASS);
         if (ctx.IMPLEMENTS() == null && ctx.EXTENDS() == null) {
             nodeProject.addChild(classNode);
             return;
         }
 
+        boolean added = false;
         if (ctx.IMPLEMENTS() != null) {
             for (var type : ctx.typeList()) {
                 String nodeValue = imports.getOrDefault(type.getText(), packageDeclaration + "." + type.getText());
+                // TODO maybe can be needed to check in the others projects
                 var interfaceNode = nodeProject.find(nodeValue, Node.Type.INTERFACE);
                 if (interfaceNode == null) {
-                    throw new RuntimeException("Interface node not found for " + nodeValue);
+                    // ignore interfaces from other projects, like Serializable for example
+                    continue;
                 }
                 // TODO FIX TO USE TYPE VALUE
                 interfaceNode.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS));
+                added = true;
             }
         }
 
@@ -78,16 +81,33 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
             String baseTypeQualifiedName = imports.get(baseType.classOrInterfaceType().identifier(0).getText());
             if (baseTypeQualifiedName != null && !ServiceMetadata.typeBelongsToService(baseTypeQualifiedName)) {
                 nodeProject.addChild(classNode);
+                added = true;
                 DependenciesSymbolTable.add((String) classNode.value, baseTypeQualifiedName);
             } else {
                 String nodeValue = imports.getOrDefault(baseType.getText(), packageDeclaration + "." + baseType.getText());
+                // TODO maybe can be needed to check in the others projects
                 var baseClassNode = nodeProject.find(nodeValue, Node.Type.CLASS);
-                if (baseClassNode == null) {
-                    throw new RuntimeException("Base Class node not found for " + nodeValue);
+                if (baseClassNode != null) {
+                    // ignore baseclass from external projects
+                    baseClassNode.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS));
+                    added = true;
                 }
-                baseClassNode.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS));
             }
         }
+        if (!added) {
+            nodeProject.addChild(classNode);
+        }
+    }
+
+    @Override
+    public void exitClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
+        System.out.println("exitClassDeclaration=" + ctx.getText());
+        System.out.println(qualifiedClassName);
+        Node classNode = nodeProject.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS);
+        if (classNode == null) {
+            return;
+        }
+        imports.forEach((key, value) -> classNode.addChild(new Node(key, value, Node.Type.IMPORT_DECLARATION)));
     }
 
     @Override
@@ -116,6 +136,9 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
         var type = getType(fieldDeclaration.typeType());
         Node classNode = nodeProject.find(qualifiedClassName, Node.Type.CLASS);
+        if (classNode == null) {
+            return;
+        }
         Node fieldNode = classNode.find(type);
         if (fieldNode == null) {
             fieldNode = new Node(type, Node.Type.INSTANCE_VARIABLE_TYPE);
@@ -131,8 +154,14 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     @Override
     public void enterConstructorDeclaration(JavaParser.ConstructorDeclarationContext ctx) {
+        System.out.println("enterConstructorDeclaration=" + ctx.getText());
         Node nodeClass = nodeProject.find(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS);
-        Map<String, Evaluable> parameters = ctx.formalParameters().formalParameterList().formalParameter()
+        var formalParameters = ctx.formalParameters().formalParameterList();
+        if (formalParameters == null) {
+            return;
+        }
+
+        Map<String, Evaluable> parameters = formalParameters.formalParameter()
                 .stream()
                 .map(Evaluable::annotatedValueFrom)
                 .collect(Collectors.toMap(Evaluable::id, Function.identity()));
@@ -199,6 +228,11 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     @Override
     public void enterMethodCall(JavaParser.MethodCallContext ctx) {
+        System.out.println("enterMethodCall=" + ctx.getText());
+        System.out.println(qualifiedClassName);
+        if (qualifiedClassName == null) {
+            return;
+        }
         Node classNode = nodeProject.find(qualifiedClassName, Node.Type.CLASS);
         String key = String.format("%s-%s-%s", nodeProject, classNode, ctx.getText());
         System.out.println(key);
@@ -228,20 +262,33 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     @Override
     public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
         System.out.println("enterMethodDeclaration=" + ctx.getText());
+        System.out.println(qualifiedClassName);
         if (ctx.typeTypeOrVoid() == null) {
             return;
         }
 
+        Node classCode = nodeProject.find(qualifiedClassName, Node.Type.CLASS);
+        if (classCode == null) {
+            return;
+        }
         Node methodDeclarationNode = new Node(ctx.identifier().getText(), Node.Type.METHOD_DECLARATION);
-        nodeProject.find(qualifiedClassName, Node.Type.CLASS)
-                .addChild(methodDeclarationNode);
+        classCode.addChild(methodDeclarationNode);
 
-        var blockStatements = ctx.methodBody().block().blockStatement();
+        var block = ctx.methodBody().block();
+        if (block == null) {
+            return;
+        }
+        var blockStatements = block.blockStatement();
+        if (blockStatements.isEmpty()) {
+            return;
+        }
         var returnStatement = blockStatements
                 .get(blockStatements.size() - 1)
                 .statement();
-        String returnExpression = returnStatement.expression(0).getText();
-        methodDeclarationNode.addChild(new Node(returnExpression, Node.Type.RETURN_EXPRESSION));
+        var returnExpression = returnStatement.expression(0);
+        if (returnExpression != null) {
+            methodDeclarationNode.addChild(new Node(returnExpression.getText(), Node.Type.RETURN_EXPRESSION));
+        }
     }
 
     private Node getCallerNode(String caller) {

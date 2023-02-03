@@ -199,6 +199,12 @@ public class CloudFormationSymbolsTable {
                 .orElseGet(() -> finder.apply(snsTopicsTable));
     }
 
+    public void merge(CloudFormationSymbolsTable other) {
+        sqsQueuesTable.putAll(other.sqsQueuesTable);
+        snsTopicsTable.putAll(other.snsTopicsTable);
+        ssmParametersTable.putAll(other.ssmParametersTable);
+    }
+
     public void populateGraph(String originService) {
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
             ServicesSymbolTable.add((String) sqsQueueEntry.getValue().parameters().get("QueueName"), ServicesSymbolTable.Resource::sqsQueue);

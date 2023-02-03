@@ -1,6 +1,5 @@
 package graph;
 
-import cloudformationparser.CloudFormationSymbolsTable;
 import services.ServicesGraph;
 import services.ServicesSymbolTable;
 
@@ -44,10 +43,7 @@ public class TreeListener implements Consumer<Node> {
                 switch (child.type) {
                     case METHOD_CALL -> {
                         MethodCallNodeValue methodCallNodeValue = (MethodCallNodeValue) child.value;
-                        Node propertiesVariableNode = currentProjectNode.find(methodCallNodeValue.caller).parent;
-                        Node propertiesNode = currentProjectNode.find(propertiesVariableNode.value, Node.Type.INSTANCE_VARIABLE_TYPE);
-                        Node propertiesImplNode = propertiesNode.findUnique(Node.Type.INSTANCE_VARIABLE_DECLARATION);
-                        String destination = (String) propertiesImplNode.find(methodCallNodeValue.call).children.get(0).value;
+                        String destination = new MethodEvaluator(root, (String) currentClassNode.value, methodCallNodeValue).evaluate();
                         String destinationResource = resolveResource(destination);
                         if (destinationResource != null) {
                             System.out.printf("MESSAGING_SENDER::METHOD_CALL: %s -> %s\n", currentProjectNode.value, destinationResource);
@@ -78,39 +74,7 @@ public class TreeListener implements Consumer<Node> {
     }
 
     private String resolveResource(String resource) {
-        boolean isParameter = resource.startsWith("${") && resource.endsWith("}");
-        if (isParameter) {
-            try {
-                return resolveParameter(root, resource.substring(2, resource.length() - 1));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return resource;
-    }
-
-    private String resolveParameter(Node projectNode, String parameter) {
-        for (Node cloudFormationSymbolsTableNode : projectNode.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
-            CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
-            CloudFormationSymbolsTable.SsmParameter ssmParameter = cloudFormationSymbolsTable.getSsmParameter(parameter);
-            if (ssmParameter != null) {
-                return (String) cloudFormationSymbolsTable.findSsmParameterValue(ssmParameter);
-            }
-
-            for (CloudFormationSymbolsTable.CloudFormationStack stack : cloudFormationSymbolsTable.getStacks()) {
-                // Node node findNode for stack.service
-                Node stackNode = root.find("api-" + stack.getService());
-                if (stackNode == null) {
-                    continue;
-                }
-                String stackParameter = resolveParameter(stackNode, parameter);
-                // if resolveParameter != null for node and parameter, so returns it
-                if (stackParameter != null) {
-                    return stackParameter;
-                }
-            }
-        }
-
-        return null;
+        SsmParameter ssmParameter = new SsmParameter(currentProjectNode, resource);
+        return ssmParameter.resolve();
     }
 }

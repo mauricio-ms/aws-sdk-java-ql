@@ -1,7 +1,9 @@
 import cloudformationparser.CloudFormationSymbolsTable;
 import cloudformationparser.CloudFormationTemplateToSymbolsTable;
 import cloudformationparser.CloudFormationTreeGeneratorTool;
-import graph.*;
+import graph.Node;
+import graph.StdOut;
+import graph.TreeListener;
 import javaparser.CustomJavaParserListener;
 import javaparser.JavaLexer;
 import javaparser.JavaParser;
@@ -28,13 +30,13 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-//        for (String projectPath : List.of(
-//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
-//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
-//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
-//        )) {
-        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced")).toList()) {
-            String projectPath = p.toString();
+        for (String projectPath : List.of(
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
+                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
+        )) {
+//        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced")).toList()) {
+//            String projectPath = p.toString();
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
             ServiceMetadata.basePackage = null;
@@ -104,8 +106,6 @@ public class Main {
                     });
                 });
 
-        new MethodEvaluator(tree, "com.beatstars.inventory.album.service.album.ClientService", new MethodCallNodeValue("propertiesService", "getSnsTopic"))
-                .evaluate();
         tree.walk(new TreeListener(tree), Node.Type.LIB);
 
         StdOut.println("Graph");
@@ -151,6 +151,7 @@ public class Main {
             CloudFormationTemplateToSymbolsTable visitor = new CloudFormationTemplateToSymbolsTable((String) clientStackNode.value, cloudFormationStack.getParameters());
             visitor.visit(parseTree);
             CloudFormationSymbolsTable cloudFormationClientSymbolsTable = visitor.getCloudFormationSymbolsTable();
+            cloudFormationSymbolsTable.merge(cloudFormationClientSymbolsTable);
             cloudFormationClientSymbolsTable.populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
             processInnerStacks(tree, cloudFormationClientSymbolsTable);
         }
