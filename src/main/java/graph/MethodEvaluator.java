@@ -15,15 +15,20 @@ public class MethodEvaluator {
     }
 
     public String evaluate() {
-        Node sourceClassNode = tree.find(sourceClass, Node.Type.CLASS);
-        Node callerIdNode = sourceClassNode.find(methodCallNodeValue.caller, Node.Type.INSTANCE_VARIABLE_DECLARATION);
-        Node callerTypeNode = callerIdNode.parent;
-        if (callerTypeNode.type != Node.Type.INSTANCE_VARIABLE_TYPE) {
-            throw new RuntimeException("Unexpected node type");
+        try {
+            Node sourceClassNode = tree.find(sourceClass, Node.Type.CLASS);
+            Node callerIdNode = sourceClassNode.find(methodCallNodeValue.caller, Node.Type.INSTANCE_VARIABLE_DECLARATION);
+            Node callerTypeNode = callerIdNode.parent; 
+            if (callerTypeNode.type != Node.Type.INSTANCE_VARIABLE_TYPE) {
+                throw new RuntimeException("Unexpected node type");
+            }
+            String qualifiedClassName = qualifiedClassName(sourceClassNode, (String) callerTypeNode.value);
+            Node callerClassNode = tree.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS);
+            return evaluateFromCaller(sourceClassNode, callerClassNode);
+        } catch (Exception e) {
+            // TODO when is not possible to evaluate: put the expression, like: String.format("%s-core-audio-%s-sqs", CommonConfig.env, step.getQueueName())
+            return methodCallNodeValue.caller + "#" + methodCallNodeValue.call;
         }
-        String qualifiedClassName = qualifiedClassName(sourceClassNode, (String) callerTypeNode.value);
-        Node callerClassNode = tree.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS);
-        return evaluateFromCaller(sourceClassNode, callerClassNode);
     }
 
     private String qualifiedClassName(Node sourceClassNode, String simpleClassName) {

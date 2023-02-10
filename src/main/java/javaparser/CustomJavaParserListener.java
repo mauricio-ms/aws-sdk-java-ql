@@ -156,6 +156,9 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     public void enterConstructorDeclaration(JavaParser.ConstructorDeclarationContext ctx) {
         System.out.println("enterConstructorDeclaration=" + ctx.getText());
         Node nodeClass = nodeProject.find(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS);
+        if (nodeClass == null) {
+            return;
+        }
         var formalParameters = ctx.formalParameters().formalParameterList();
         if (formalParameters == null) {
             return;
@@ -171,7 +174,11 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     private List<String> getSuperParameters(JavaParser.ConstructorDeclarationContext ctx) {
         for (var blockStatement : ctx.constructorBody.blockStatement()) {
-            var methodCall = blockStatement.statement().statementExpression.methodCall();
+            var statement = blockStatement.statement();
+            if (statement == null) {
+                continue;
+            }
+            var methodCall = statement.statementExpression.methodCall();
             if (methodCall != null && methodCall.SUPER() != null) {
                 return methodCall.expressionList()
                         .expression()
