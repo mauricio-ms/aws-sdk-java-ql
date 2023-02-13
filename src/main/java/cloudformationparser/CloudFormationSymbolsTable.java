@@ -17,6 +17,7 @@ public class CloudFormationSymbolsTable {
         CLOUD_FORMATION_STACK("AWS::CloudFormation::Stack"),
         SQS_QUEUE("AWS::SQS::Queue"),
         SNS_TOPIC("AWS::SNS::Topic"),
+        SNS_SUBSCRIPTION("AWS::SNS::Subscription"),
         SSM_PARAMETER("AWS::SSM::Parameter");
 
         private final String value;
@@ -129,6 +130,8 @@ public class CloudFormationSymbolsTable {
 
     private final Map<String, AbstractResource> snsTopicsTable;
 
+    private final Map<String, AbstractResource> snsSubscriptionsTable;
+
     private final Map<String, SsmParameter> ssmParametersTable;
 
     public CloudFormationSymbolsTable(String name) {
@@ -137,6 +140,7 @@ public class CloudFormationSymbolsTable {
         stacksTable = new HashMap<>();
         sqsQueuesTable = new HashMap<>();
         snsTopicsTable = new HashMap<>();
+        snsSubscriptionsTable = new HashMap<>();
         ssmParametersTable = new HashMap<>();
     }
 
@@ -173,8 +177,16 @@ public class CloudFormationSymbolsTable {
         sqsQueuesTable.put(key, resource);
     }
 
+    public boolean containsSqsQueue(String key) {
+        return sqsQueuesTable.containsKey(key);
+    }
+
     public void addSnsTopic(String key, AbstractResource resource) {
         snsTopicsTable.put(key, resource);
+    }
+
+    public void addSnsSubscription(String key, AbstractResource resource) {
+        snsSubscriptionsTable.put(key, resource);
     }
 
     public void addSsmParameter(String key, SsmParameter ssmParameter) {
@@ -224,6 +236,15 @@ public class CloudFormationSymbolsTable {
 
         for (var snsTopicEntry : snsTopicsTable.entrySet()) {
             ServicesGraph.addEdge(currentServiceId, ServicesSymbolTable.getId((String) snsTopicEntry.getValue().parameters().get("TopicName")));
+        }
+
+        for (var snsSubscriptionEntry : snsSubscriptionsTable.entrySet()) {
+            String topicArn = (String) snsSubscriptionEntry.getValue().get("TopicArn");
+            String[] topicArnComponents = topicArn.split(":");
+            String snsOrigin = topicArnComponents[topicArnComponents.length - 1];
+            ServicesGraph.addEdge(ServicesSymbolTable.getId(snsOrigin),
+                    ServicesSymbolTable.getId((String) sqsQueuesTable.get(snsSubscriptionEntry.getValue().get("Endpoint")).get("QueueName")),
+                    1);
         }
     }
 }

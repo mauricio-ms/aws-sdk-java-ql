@@ -51,6 +51,21 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
                         cloudFormationSymbolsTable.addSqsQueue(resourceKey, new CloudFormationSymbolsTable.AbstractResource(parseParameters(resourceObject)));
                 case SNS_TOPIC ->
                         cloudFormationSymbolsTable.addSnsTopic(resourceKey, new CloudFormationSymbolsTable.AbstractResource(parseParameters(resourceObject)));
+                case SNS_SUBSCRIPTION -> {
+                    Map<String, Object> parameters = parseParameters(resourceObject);
+                    if ("SQS".equalsIgnoreCase(parameters.get("Protocol").toString())) {
+                        Object endpoint = parameters.get("Endpoint");
+                        if (endpoint instanceof Map.Entry<?,?> entry) {
+                            if ("Arn".equalsIgnoreCase((String) entry.getValue())) {
+                                String endpointKeyValue = (String) entry.getKey();
+                                if (cloudFormationSymbolsTable.containsSqsQueue(endpointKeyValue)) {
+                                    parameters.put("Endpoint", endpointKeyValue);
+                                }
+                            }
+                        }
+                    }
+                    cloudFormationSymbolsTable.addSnsSubscription(resourceKey, new CloudFormationSymbolsTable.AbstractResource(parameters));
+                }
                 case SSM_PARAMETER -> {
                     try {
                         CloudFormationSymbolsTable.SsmParameter ssmParameter = new CloudFormationSymbolsTable.SsmParameter(parseParameters(resourceObject));
@@ -268,7 +283,9 @@ public class CloudFormationTemplateToSymbolsTable extends YamlBaseVisitor {
     }
 
     private Map.Entry<String, String> parseAttributeGetter(YamlParser.AttributeGetterContext ctx) {
-        return Map.entry(ctx.attribute().NAME(0).getText(), ctx.attribute().NAME(1).getText());
+        String key = ctx.attribute().NAME(0).getText();
+        String value = ctx.attribute().NAME(1).getText();
+        return Map.entry(key, value);
     }
 
     private Map.Entry<String, Object> parseStatement(YamlParser.StatementContext ctx) {
