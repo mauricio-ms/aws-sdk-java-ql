@@ -231,7 +231,7 @@ public class CloudFormationSymbolsTable {
             currentServiceId = ServicesSymbolTable.add(originService, ServicesSymbolTable.Resource::service);
         }
         for (var sqsQueueEntry : sqsQueuesTable.entrySet()) {
-            ServicesGraph.addEdge(currentServiceId, ServicesSymbolTable.getId((String) sqsQueueEntry.getValue().parameters().get("QueueName")));
+            ServicesGraph.addEdge(ServicesSymbolTable.getId((String) sqsQueueEntry.getValue().parameters().get("QueueName")), currentServiceId);
         }
 
         for (var snsTopicEntry : snsTopicsTable.entrySet()) {
