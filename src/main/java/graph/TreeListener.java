@@ -24,7 +24,7 @@ public class TreeListener implements Consumer<Node> {
         }
 
         switch (node.type) {
-            case PROJECT -> currentProjectNode = node;
+            case API -> currentProjectNode = node;
             case CLASS -> currentClassNode = node;
             case SQS_LISTENER -> {
                 System.out.println("---->> " + node.value.toString());

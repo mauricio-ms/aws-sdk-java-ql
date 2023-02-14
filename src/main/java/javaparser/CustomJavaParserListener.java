@@ -24,6 +24,8 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     private String qualifiedClassName;
 
+    private Node currentMethodDeclarationNode;
+
     public CustomJavaParserListener(Node nodeProject) {
         imports = new HashMap<>();
         this.nodeProject = nodeProject;
@@ -47,6 +49,7 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     @Override
     public void enterInterfaceDeclaration(JavaParser.InterfaceDeclarationContext ctx) {
         nodeProject.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.INTERFACE));
+        qualifiedClassName = packageDeclaration + "." + ctx.identifier().getText();
     }
 
     @Override
@@ -117,8 +120,10 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
     @Override
     public void enterAnnotation(JavaParser.AnnotationContext ctx) {
+        System.out.println("enterAnnotation=" + ctx.getText());
+        System.out.println(qualifiedClassName);
         if ("SqsListener".equals(ctx.qualifiedName().getText())) {
-            nodeProject.find(qualifiedClassName, Node.Type.CLASS)
+            nodeProject.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS)
                     .addChild(new Node(requireAnnotationValue(ctx), Node.Type.SQS_LISTENER));
         }
     }
@@ -240,9 +245,6 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
         if (qualifiedClassName == null) {
             return;
         }
-        Node classNode = nodeProject.find(qualifiedClassName, Node.Type.CLASS);
-        String key = String.format("%s-%s-%s", nodeProject, classNode, ctx.getText());
-        System.out.println(key);
         String caller = ctx.getParent().getChild(0).getText();
         Node nodeCaller = getCallerNode(caller);
         Node.Type messagingNodeType = getMessagingNodeType(nodeCaller);
@@ -251,7 +253,7 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
         }
 
         Node messagingNode = new Node(ctx.identifier().getText(), messagingNodeType);
-        nodeCaller.addChild(messagingNode);
+        currentMethodDeclarationNode.addChild(messagingNode);
         var arguments = ctx.expressionList();
         if (arguments != null) {
             var firstArgument = arguments.expression(0);
@@ -278,8 +280,8 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
         if (classCode == null) {
             return;
         }
-        Node methodDeclarationNode = new Node(ctx.identifier().getText(), Node.Type.METHOD_DECLARATION);
-        classCode.addChild(methodDeclarationNode);
+        currentMethodDeclarationNode = new Node(ctx.identifier().getText(), Node.Type.METHOD_DECLARATION);
+        classCode.addChild(currentMethodDeclarationNode);
 
         var block = ctx.methodBody().block();
         if (block == null) {
@@ -294,8 +296,13 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
                 .statement();
         var returnExpression = returnStatement.expression(0);
         if (returnExpression != null) {
-            methodDeclarationNode.addChild(new Node(returnExpression.getText(), Node.Type.RETURN_EXPRESSION));
+            currentMethodDeclarationNode.addChild(new Node(returnExpression.getText(), Node.Type.RETURN_EXPRESSION));
         }
+    }
+
+    @Override
+    public void exitMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
+        currentMethodDeclarationNode = null;
     }
 
     private Node getCallerNode(String caller) {

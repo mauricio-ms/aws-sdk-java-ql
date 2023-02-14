@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import services.DependenciesSymbolTable;
-import services.Infrastructure;
+import services.Project;
 import services.ServiceMetadata;
 import services.ServicesGraph;
 
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -30,25 +31,21 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Node tree = new Node(null, null);
-        for (String projectPath : List.of(
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
-                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
-        )) {
-//        for (Path p : Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced")).toList()) {
-//            String projectPath = p.toString();
+//        for (String projectPath : List.of(
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
+//                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
+//        )) {
+        List<Project> projects = readProjects();
+        for (Project project : projects) {
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
             ServiceMetadata.basePackage = null;
-            String[] projectParts = projectPath.split("/");
-            String project = projectParts[projectParts.length - 1];
-            System.out.println(">> Analyzing project " + project);
-
-            Infrastructure infrastructure = new Infrastructure(projectPath);
-            Node nodeProject = new Node(project, infrastructure.hasStackYaml() ? Node.Type.PROJECT : Node.Type.LIB);
+            System.out.println(">> Analyzing project " + project.name());
+            Node nodeProject = new Node(project.name(), project.type());
             tree.addChild(nodeProject);
 
-            for (Path stackFilePath : infrastructure.getStacksFilesPath()) {
+            for (Path stackFilePath : project.infrastructure().stacksFilesPath()) {
                 boolean isStack = stackFilePath.endsWith("stack.yaml");
                 var cloudFormationSymbolTable = isStack ?
                         CloudFormationTreeGeneratorTool.parse(stackFilePath.toString()) : stackFilePath.toString();
@@ -58,12 +55,27 @@ public class Main {
                 nodeProject.addChild(new Node(cloudFormationSymbolTable, type));
             }
 
-            String projectFilesPath = projectPath + SRC;
+            String projectFilesPath = project.path() + SRC;
             try (Stream<Path> pathStream = Files.walk(Paths.get(projectFilesPath))) {
                 pathStream
                         .filter(Files::isRegularFile)
                         .forEach(path -> parse(nodeProject, path.toString()));
             }
+        }
+
+        for (Project project : projects) {
+            // TODO - Receive this as input to be possible use in multiple structures of projects
+            Node nodeClient = new Node(project.name() + ":client", Node.Type.CLIENT);
+            String clientFilesPath = project.path() + "/" + project.name().replaceFirst("api-", "") + "-client" + SRC;
+            try (Stream<Path> pathStream = Files.walk(Paths.get(clientFilesPath))) {
+                pathStream
+                        .filter(Files::isRegularFile)
+                        .forEach(path -> parse(nodeClient, path.toString()));
+            }
+
+            // TODO CREATE NODES FOR CLIENT INPUTS
+
+            System.out.println(nodeClient);
         }
 
         // get all cloudFormationSymbolsTable that are stack.yaml
@@ -111,6 +123,14 @@ public class Main {
         StdOut.println("Graph");
         ServicesGraph.show();
         generateHtml();
+    }
+
+    private static List<Project> readProjects() throws IOException {
+        try (Stream<Path> paths = Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced_3"))) {
+            return paths
+                    .map(path -> new Project(path.toString()))
+                    .toList();
+        }
     }
 
     private static void generateHtml() throws IOException {

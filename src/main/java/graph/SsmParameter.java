@@ -34,7 +34,7 @@ public class SsmParameter {
 
             for (CloudFormationSymbolsTable.CloudFormationStack stack : cloudFormationSymbolsTable.getStacks()) {
                 // Node node findNode for stack.service
-                Node stackNode = root.find("api-" + stack.getService(), Node.Type.PROJECT, Node.Type.LIB);
+                Node stackNode = root.find("api-" + stack.getService(), Node.Type.API, Node.Type.LIB);
                 if (stackNode == null) {
                     continue;
                 }

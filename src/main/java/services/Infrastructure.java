@@ -11,10 +11,10 @@ public class Infrastructure {
     private final List<Path> stacksFilesPath;
 
     public Infrastructure(String projectPath) {
-        stacksFilesPath = getStacksFilesPath(projectPath);
+        stacksFilesPath = readStacksFilesPath(projectPath);
     }
 
-    private static List<Path> getStacksFilesPath(String projectPath) {
+    private static List<Path> readStacksFilesPath(String projectPath) {
         Path infrastructurePath = Path.of(projectPath, "infrastructure");
         if (Files.notExists(infrastructurePath)) {
             return List.of();
@@ -34,7 +34,7 @@ public class Infrastructure {
         }
     }
 
-    public List<Path> getStacksFilesPath() {
+    public List<Path> stacksFilesPath() {
         return stacksFilesPath;
     }
 
