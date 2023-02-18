@@ -1,19 +1,18 @@
 import cloudformationparser.CloudFormationSymbolsTable;
 import cloudformationparser.CloudFormationTemplateToSymbolsTable;
 import cloudformationparser.CloudFormationTreeGeneratorTool;
-import graph.Node;
-import graph.StdOut;
-import graph.TreeListener;
+import graph.*;
 import javaparser.CustomJavaParserListener;
 import javaparser.JavaLexer;
 import javaparser.JavaParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import services.DependenciesSymbolTable;
-import services.Project;
-import services.ServiceMetadata;
-import services.ServicesGraph;
+import services.*;
+import tree.TreeListener;
+import tree.TreeListenerClient;
+import tree.TreeListenerFactory;
+import tree.TreeListenerProject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -30,20 +28,20 @@ public class Main {
     private static final String SRC = "/src/main/java";
 
     public static void main(String[] args) throws IOException {
-        Node tree = new Node(null, null);
 //        for (String projectPath : List.of(
 //                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-inventory",
 //                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-album",
 //                "/home/mauricio/development/aws-sdk-java-ql/beatstars/projects_tmp/api-contract"
 //        )) {
         List<Project> projects = readProjects();
+        Node projectTree = new Node(null, null);
         for (Project project : projects) {
 //        while (!StdIn.isEmpty()) {
 //            String projectPath = StdIn.readString();
             ServiceMetadata.basePackage = null;
             System.out.println(">> Analyzing project " + project.name());
             Node nodeProject = new Node(project.name(), project.type());
-            tree.addChild(nodeProject);
+            projectTree.addChild(nodeProject);
 
             for (Path stackFilePath : project.infrastructure().stacksFilesPath()) {
                 boolean isStack = stackFilePath.endsWith("stack.yaml");
@@ -63,9 +61,11 @@ public class Main {
             }
         }
 
+        // TODO - Receive this as input to be possible use in multiple structures of projects
+        Node clientTree = new Node(null, null);
         for (Project project : projects) {
-            // TODO - Receive this as input to be possible use in multiple structures of projects
-            Node nodeClient = new Node(project.name() + ":client", Node.Type.CLIENT);
+            Node nodeClient = new Node(project.name(), Node.Type.CLIENT);
+            clientTree.addChild(nodeClient);
             String clientFilesPath = project.path() + "/" + project.name().replaceFirst("api-", "") + "-client" + SRC;
             try (Stream<Path> pathStream = Files.walk(Paths.get(clientFilesPath))) {
                 pathStream
@@ -73,14 +73,36 @@ public class Main {
                         .forEach(path -> parse(nodeClient, path.toString()));
             }
 
-            // TODO CREATE NODES FOR CLIENT INPUTS
-
-            System.out.println(nodeClient);
+//            System.out.println(nodeClient);
+//            List<Node> sqsSenderNodes = nodeClient.find(Node.Type.SQS_SENDER);
+//            for (Node sqsSenderNode : sqsSenderNodes) {
+//                Tuple<Node> nodeTuple = sqsSenderNode.topTwo(nodeClient);
+//                System.out.println(nodeTuple);
+//
+//                Node sqsSenderNodePublicInterface = nodeTuple.first();
+//                if (!sqsSenderNodePublicInterface.type.isJavaType()) {
+//                    throw new RuntimeException("Unexpected type for a public interface of a SQS_SENDER");
+//                }
+//
+//                Node sqsSenderNodeExecutor = nodeTuple.second();
+//                if (sqsSenderNodeExecutor.type != Node.Type.METHOD_DECLARATION) {
+//                    throw new RuntimeException("Unexpected type for an executor of a SQS_SENDER");
+//                }
+//
+//                String resourceName = sqsSenderNodePublicInterface.id + ":" + sqsSenderNodeExecutor;
+//                Integer resourceId = ServicesSymbolTable.getId(resourceName);
+//                if (resourceId == null) {
+//                    resourceId = ServicesSymbolTable.add(resourceName, ServicesSymbolTable.Resource::client);
+//                }
+////                ServicesGraph.addEdge(resourceId, sqsSenderNode.);
+//
+//                System.out.println(sqsSenderNodePublicInterface);
+//            }
         }
 
         // get all cloudFormationSymbolsTable that are stack.yaml
         //  populate it in the graph
-        for (Node cloudFormationSymbolsTableNode : tree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
+        for (Node cloudFormationSymbolsTableNode : projectTree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
             CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
             cloudFormationSymbolsTable.populateGraph("api-" + cloudFormationSymbolsTable.getParameterValue("Service"));
         }
@@ -88,9 +110,9 @@ public class Main {
         // then, get all cloudFormationSymbolsTable that are stack.yaml again
         //  for each check if it has a stack associated to it
         //      if it has, so get the cloudFormationSymbolsTable and populate in the graph accordingly
-        for (Node cloudFormationSymbolsTableNode : tree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
+        for (Node cloudFormationSymbolsTableNode : projectTree.find(Node.Type.CLOUD_FORMATION_STACK_SYMBOLS_TABLE)) {
             CloudFormationSymbolsTable cloudFormationSymbolsTable = (CloudFormationSymbolsTable) cloudFormationSymbolsTableNode.value;
-            processInnerStacks(tree, cloudFormationSymbolsTable);
+            processInnerStacks(projectTree, cloudFormationSymbolsTable);
         }
 
 //        StdOut.println("Tree");
@@ -98,9 +120,9 @@ public class Main {
 
         DependenciesSymbolTable.get()
                 .forEach((source, targets) -> {
-                    Node sourceNode = tree.find(source, Node.Type.CLASS);
+                    Node sourceNode = projectTree.find(source, Node.Type.CLASS);
                     targets.forEach(target -> {
-                        Node targetNode = tree.find(target, Node.Type.CLASS);
+                        Node targetNode = projectTree.find(target, Node.Type.CLASS);
                         if (targetNode == null) {
                             return;
                         }
@@ -118,7 +140,8 @@ public class Main {
                     });
                 });
 
-        tree.walk(new TreeListener(tree), Node.Type.LIB);
+        projectTree.walk(TreeListenerFactory.project(projectTree), Node.Type.LIB);
+        clientTree.walk(TreeListenerFactory.client(clientTree, projectTree), Node.Type.LIB);
 
         StdOut.println("Graph");
         ServicesGraph.show();

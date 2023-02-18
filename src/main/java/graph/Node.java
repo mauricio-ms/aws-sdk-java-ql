@@ -41,8 +41,18 @@ public class Node {
         CLIENT(3),
         LIB(4),
         IMPORT_DECLARATION(5),
-        INTERFACE(6),
-        CLASS(7),
+        INTERFACE(6) {
+            @Override
+            public boolean isJavaType() {
+                return true;
+            }
+        },
+        CLASS(7) {
+            @Override
+            public boolean isJavaType() {
+                return true;
+            }
+        },
         CONSTRUCTOR(8),
         INSTANCE_VARIABLE_TYPE(9),
         INSTANCE_VARIABLE_DECLARATION(10),
@@ -67,6 +77,10 @@ public class Node {
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Type not found for value " + value));
         }
+
+        public boolean isJavaType() {
+            return false;
+        }
     }
 
     public Node root() {
@@ -84,6 +98,14 @@ public class Node {
 
     public void removeChild(Node child) {
         children.remove(child);
+    }
+
+    public Node top(Node baseRoot) {
+        Node temp = this;
+        while (temp.parent != baseRoot) {
+            temp = temp.parent;
+        }
+        return temp;
     }
 
     public Node findUpwards(Node.Type... types) {
