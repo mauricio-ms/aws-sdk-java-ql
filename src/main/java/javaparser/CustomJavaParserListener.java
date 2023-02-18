@@ -242,11 +242,19 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
     public void enterMethodCall(JavaParser.MethodCallContext ctx) {
         System.out.println("enterMethodCall=" + ctx.getText());
         System.out.println(qualifiedClassName);
-        if (qualifiedClassName == null) {
+        if (qualifiedClassName == null || currentMethodDeclarationNode == null) {
             return;
         }
+
         String caller = ctx.getParent().getChild(0).getText();
         Node nodeCaller = getCallerNode(caller);
+        if (nodeCaller == null) {
+            return;
+        }
+
+        String call = ctx.identifier().getText();
+        currentMethodDeclarationNode.addChild(new Node(new MethodCallNodeValue((String) nodeCaller.id, call), Node.Type.METHOD_CALL));
+
         Node.Type messagingNodeType = getMessagingNodeType(nodeCaller);
         if (messagingNodeType == null) {
             return;

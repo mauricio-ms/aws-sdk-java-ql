@@ -9,10 +9,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import services.*;
-import tree.TreeListener;
-import tree.TreeListenerClient;
-import tree.TreeListenerFactory;
-import tree.TreeListenerProject;
+import tree.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,32 +69,6 @@ public class Main {
                         .filter(Files::isRegularFile)
                         .forEach(path -> parse(nodeClient, path.toString()));
             }
-
-//            System.out.println(nodeClient);
-//            List<Node> sqsSenderNodes = nodeClient.find(Node.Type.SQS_SENDER);
-//            for (Node sqsSenderNode : sqsSenderNodes) {
-//                Tuple<Node> nodeTuple = sqsSenderNode.topTwo(nodeClient);
-//                System.out.println(nodeTuple);
-//
-//                Node sqsSenderNodePublicInterface = nodeTuple.first();
-//                if (!sqsSenderNodePublicInterface.type.isJavaType()) {
-//                    throw new RuntimeException("Unexpected type for a public interface of a SQS_SENDER");
-//                }
-//
-//                Node sqsSenderNodeExecutor = nodeTuple.second();
-//                if (sqsSenderNodeExecutor.type != Node.Type.METHOD_DECLARATION) {
-//                    throw new RuntimeException("Unexpected type for an executor of a SQS_SENDER");
-//                }
-//
-//                String resourceName = sqsSenderNodePublicInterface.id + ":" + sqsSenderNodeExecutor;
-//                Integer resourceId = ServicesSymbolTable.getId(resourceName);
-//                if (resourceId == null) {
-//                    resourceId = ServicesSymbolTable.add(resourceName, ServicesSymbolTable.Resource::client);
-//                }
-////                ServicesGraph.addEdge(resourceId, sqsSenderNode.);
-//
-//                System.out.println(sqsSenderNodePublicInterface);
-//            }
         }
 
         // get all cloudFormationSymbolsTable that are stack.yaml
@@ -140,8 +111,10 @@ public class Main {
                     });
                 });
 
-        projectTree.walk(TreeListenerFactory.project(projectTree), Node.Type.LIB);
-        clientTree.walk(TreeListenerFactory.client(clientTree, projectTree), Node.Type.LIB);
+        projectTree.walk(TreeListenableFactory.project(projectTree), Node.Type.LIB);
+        clientTree.walk(TreeListenableFactory.client(clientTree, projectTree), Node.Type.LIB);
+
+        projectTree.walk(new TreeListenerDependencies(), Node.Type.LIB);
 
         StdOut.println("Graph");
         ServicesGraph.show();

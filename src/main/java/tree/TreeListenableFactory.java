@@ -3,9 +3,9 @@ package tree;
 import graph.Node;
 import graph.SsmParameter;
 
-public final class TreeListenerFactory {
+public final class TreeListenableFactory {
 
-    private TreeListenerFactory() {
+    private TreeListenableFactory() {
     }
 
     public static TreeListenable project(Node tree) {
