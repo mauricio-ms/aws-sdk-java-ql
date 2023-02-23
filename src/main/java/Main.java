@@ -60,7 +60,7 @@ public class Main {
 
         // TODO - Receive this as input to be possible use in multiple structures of projects
         Node clientTree = new Node(null, null);
-        for (Project project : projects) {
+        for (Project project : projects.stream().filter(Project::isApi).toList()) {
             Node nodeClient = new Node(project.name(), Node.Type.CLIENT);
             clientTree.addChild(nodeClient);
             String clientFilesPath = project.path() + "/" + project.name().replaceFirst("api-", "") + "-client" + SRC;
@@ -93,9 +93,13 @@ public class Main {
                 .forEach((source, targets) -> {
                     Node sourceNode = projectTree.find(source, Node.Type.CLASS);
                     targets.forEach(target -> {
-                        Node targetNode = projectTree.find(target, Node.Type.CLASS);
+                        Node targetNode = projectTree.find(target, Node.Type.INTERFACE, Node.Type.CLASS);
                         if (targetNode == null) {
-                            return;
+                            // TODO - Maybe can be needed to replicate the structure from the client to project tree in this case
+                            targetNode = clientTree.find(target, Node.Type.INTERFACE, Node.Type.CLASS);
+                            if (targetNode == null) {
+                                return;
+                            }
                         }
                         if (sourceNode == null) {
                             throw new RuntimeException("Node not added in the tree: " + source);
@@ -122,7 +126,7 @@ public class Main {
     }
 
     private static List<Project> readProjects() throws IOException {
-        try (Stream<Path> paths = Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced_3"))) {
+        try (Stream<Path> paths = Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced_4"))) {
             return paths
                     .map(path -> new Project(path.toString()))
                     .toList();

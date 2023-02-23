@@ -22,6 +22,10 @@ public class Project {
         return projectPath;
     }
 
+    public boolean isApi() {
+        return type() == Node.Type.API;
+    }
+
     public Node.Type type() {
         return infrastructure.hasStackYaml() ? Node.Type.API : Node.Type.LIB;
     }

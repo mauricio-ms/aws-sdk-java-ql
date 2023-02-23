@@ -10,13 +10,20 @@ public class SsmParameter {
 
     private final String name;
 
-    public SsmParameter(Node projectNode, String name) {
+    private String defaultValue;
+
+    public SsmParameter(Node projectNode, String value) {
         root = projectNode.root();
         this.projectNode = projectNode;
-        if (name.startsWith("${") && name.endsWith("}")) {
-            this.name = name.substring(2, name.length() - 1);
+        String literalValue = value.startsWith("${") && value.endsWith("}") ?
+                value.substring(2, value.length() - 1) :
+                value;
+        String[] nameParts = literalValue.split(":");
+        if (nameParts.length > 1) {
+            name = nameParts[0];
+            defaultValue = nameParts[1];
         } else {
-            this.name = name;
+            name = literalValue;
         }
     }
 
@@ -46,6 +53,6 @@ public class SsmParameter {
             }
         }
 
-        return null;
+        return defaultValue;
     }
 }

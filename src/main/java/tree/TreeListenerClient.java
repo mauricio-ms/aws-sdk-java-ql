@@ -38,23 +38,8 @@ public class TreeListenerClient extends TreeListenerDecorator {
                     resourceId = ServicesSymbolTable.add(resourceName, ServicesSymbolTable.Resource::client);
                 }
                 setSourceServiceId(resourceId);
-            }
-            case SQS_LISTENER -> {
-                Node listenerNodePublicInterface = node.parent;
-                if (!listenerNodePublicInterface.type.isJavaType()) {
-                    throw new RuntimeException("Unexpected type for a public interface of a Listener");
-                }
-
-                String[] listenerNodePublicInterfaceParts = ((String) listenerNodePublicInterface.id).split("\\.");
-                String resourceName = listenerNodePublicInterfaceParts[listenerNodePublicInterfaceParts.length - 1];
-                Integer resourceId = ServicesSymbolTable.getId(resourceName);
-                if (resourceId == null) {
-                    resourceId = ServicesSymbolTable.add(resourceName, ServicesSymbolTable.Resource::client);
-                }
-                setSourceServiceId(resourceId);
+                super.accept(node);
             }
         }
-
-        super.accept(node);
     }
 }

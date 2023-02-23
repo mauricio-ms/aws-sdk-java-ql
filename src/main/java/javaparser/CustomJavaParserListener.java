@@ -65,17 +65,27 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
 
         boolean added = false;
         if (ctx.IMPLEMENTS() != null) {
-            for (var type : ctx.typeList()) {
-                String nodeValue = imports.getOrDefault(type.getText(), packageDeclaration + "." + type.getText());
-                // TODO maybe can be needed to check in the others projects
-                var interfaceNode = nodeProject.find(nodeValue, Node.Type.INTERFACE);
-                if (interfaceNode == null) {
-                    // ignore interfaces from other projects, like Serializable for example
-                    continue;
+            for (var types : ctx.typeList()) {
+                for (var type : types.typeType()) {
+                    String interfaceTypeQualifiedName = imports.get(type.getText());
+                    if (interfaceTypeQualifiedName != null && !ServiceMetadata.typeBelongsToService(interfaceTypeQualifiedName)) {
+                        if (!added) {
+                            nodeProject.addChild(classNode);
+                            added = true;
+                        }
+                        DependenciesSymbolTable.add((String) classNode.value, interfaceTypeQualifiedName);
+                    } else {
+                        String nodeValue = imports.getOrDefault(type.getText(), packageDeclaration + "." + type.getText());
+                        var interfaceNode = nodeProject.find(nodeValue, Node.Type.INTERFACE);
+                        if (interfaceNode == null) {
+                            // ignore interfaces from other projects, like Serializable for example
+                            continue;
+                        }
+                        // TODO FIX TO USE TYPE VALUE
+                        interfaceNode.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS));
+                        added = true;
+                    }
                 }
-                // TODO FIX TO USE TYPE VALUE
-                interfaceNode.addChild(new Node(packageDeclaration + "." + ctx.identifier().getText(), Node.Type.CLASS));
-                added = true;
             }
         }
 
@@ -83,12 +93,13 @@ public class CustomJavaParserListener extends JavaParserBaseListener {
             var baseType = ctx.typeType();
             String baseTypeQualifiedName = imports.get(baseType.classOrInterfaceType().identifier(0).getText());
             if (baseTypeQualifiedName != null && !ServiceMetadata.typeBelongsToService(baseTypeQualifiedName)) {
-                nodeProject.addChild(classNode);
-                added = true;
+                if (!added) {
+                    nodeProject.addChild(classNode);
+                    added = true;
+                }
                 DependenciesSymbolTable.add((String) classNode.value, baseTypeQualifiedName);
             } else {
                 String nodeValue = imports.getOrDefault(baseType.getText(), packageDeclaration + "." + baseType.getText());
-                // TODO maybe can be needed to check in the others projects
                 var baseClassNode = nodeProject.find(nodeValue, Node.Type.CLASS);
                 if (baseClassNode != null) {
                     // ignore baseclass from external projects

@@ -67,8 +67,8 @@ public class CloudFormationSymbolsTable {
             if (templateUrl == null) {
                 throw new RuntimeException("A CloudFormationStack object cannot be built without the 'TemplateURL' parameter");
             }
+            service = templateUrl.split("cloudformation/")[1].split("/")[0];
             String[] templateUrlParts = templateUrl.split("/");
-            service = templateUrlParts[templateUrlParts.length - 3];
             name = templateUrlParts[templateUrlParts.length - 1];
             parameters = (Map<String, Map<String, Object>>) properties.get("Parameters");
         }
