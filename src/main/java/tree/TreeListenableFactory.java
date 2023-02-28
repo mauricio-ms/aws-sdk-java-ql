@@ -15,9 +15,9 @@ public final class TreeListenableFactory {
                                 .resolve()));
     }
 
-    public static TreeListenable client(Node clientTree, Node projectTree) {
-        return new TreeListenerClient(new TreeListener(clientTree,
+    public static TreeListenable dependencies(Node clientTree, Node projectTree) {
+        return new TreeListenerDependencies(new TreeListener(clientTree,
                 (projectId, resource) -> new SsmParameter(projectTree.find(projectId, Node.Type.API), resource)
-                        .resolve()));
+                        .resolve()), clientTree);
     }
 }

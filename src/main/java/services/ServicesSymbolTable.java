@@ -24,10 +24,6 @@ public final class ServicesSymbolTable {
             return new Resource(id, "#b3b3b3");
         }
 
-        public static Resource client(Integer id) {
-            return new Resource(id, "#6699ff");
-        }
-
         public static Resource snsTopic(Integer id) {
             return new Resource(id, "#ffa366");
         }

@@ -1,15 +1,19 @@
 package tree;
 
+import graph.Implementor;
 import graph.MethodCallNodeValue;
 import graph.Node;
-import services.ServicesGraph;
+import graph.QualifiedClassName;
 import services.ServicesSymbolTable;
 
-import java.util.function.Consumer;
+public class TreeListenerDependencies extends TreeListenerDecorator {
 
-public class TreeListenerDependencies implements Consumer<Node> {
+    private final Node clientTree;
 
-    private Integer currentServiceId;
+    public TreeListenerDependencies(TreeListenable treeListenable, Node clientTree) {
+        super(treeListenable);
+        this.clientTree = clientTree;
+    }
 
     @Override
     public void accept(Node node) {
@@ -18,15 +22,30 @@ public class TreeListenerDependencies implements Consumer<Node> {
         }
 
         switch (node.type) {
-            case API -> currentServiceId = ServicesSymbolTable.getId((String) node.id);
+            case API -> setSourceServiceId(ServicesSymbolTable.getId((String) node.id));
             case METHOD_CALL -> {
                 MethodCallNodeValue methodCallNodeValue = (MethodCallNodeValue) node.value;
                 String caller = methodCallNodeValue.caller;
-                Integer clientServiceId = ServicesSymbolTable.getId(caller.substring(0, 1).toUpperCase() + caller.substring(1) + ":"
-                        + methodCallNodeValue.call);
-                if (clientServiceId != null) {
-                    ServicesGraph.addEdge(currentServiceId, clientServiceId);
+                Node classNode = node.findUpwards(Node.Type.CLASS);
+                Node instanceVariableDeclarationNode = classNode.find(caller, Node.Type.INSTANCE_VARIABLE_DECLARATION);
+                if (instanceVariableDeclarationNode == null) {
+                    return;
                 }
+                QualifiedClassName qualifiedClassName = new QualifiedClassName(classNode, caller.substring(0, 1).toUpperCase() + caller.substring(1));
+                Node callerNode = clientTree.find(qualifiedClassName.get(), Node.Type.INTERFACE, Node.Type.CLASS);
+                if (callerNode == null) {
+                    return;
+                }
+                Node implementorNode = new Implementor(callerNode, methodCallNodeValue.call).get();
+                if (implementorNode == null) {
+                    return;
+                }
+                Node clientNode = callerNode.findUpwards(Node.Type.CLIENT);
+                super.accept(clientNode);
+
+                Node callNode = implementorNode.find(methodCallNodeValue.call, Node.Type.METHOD_DECLARATION);
+                Node messagingNode = callNode.findUnique(Node.Type.SQS_SENDER, Node.Type.SNS_SENDER);
+                super.accept(messagingNode);
             }
         }
     }

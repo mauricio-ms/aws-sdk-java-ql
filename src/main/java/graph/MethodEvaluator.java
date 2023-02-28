@@ -22,27 +22,17 @@ public class MethodEvaluator {
             if (callerTypeNode.type != Node.Type.INSTANCE_VARIABLE_TYPE) {
                 throw new RuntimeException("Unexpected node type");
             }
-            String qualifiedClassName = qualifiedClassName(sourceClassNode, (String) callerTypeNode.value);
+            String qualifiedClassName = new QualifiedClassName(sourceClassNode, (String) callerTypeNode.value).get();
             Node callerClassNode = tree.find(qualifiedClassName, Node.Type.INTERFACE, Node.Type.CLASS);
-            return evaluateFromCaller(sourceClassNode, callerClassNode);
+            return evaluateFromCaller(callerClassNode);
         } catch (Exception e) {
             // TODO when is not possible to evaluate: put the expression, like: String.format("%s-core-audio-%s-sqs", CommonConfig.env, step.getQueueName())
             return methodCallNodeValue.caller + "#" + methodCallNodeValue.call;
         }
     }
 
-    private String qualifiedClassName(Node sourceClassNode, String simpleClassName) {
-        Node importDeclarationNode = sourceClassNode.find(simpleClassName, Node.Type.IMPORT_DECLARATION);
-        if (importDeclarationNode != null) {
-            return (String) importDeclarationNode.value;
-        }
-        String sourceClassFullyQualifiedName = (String) sourceClassNode.value;
-        String sourceClassPackage = sourceClassFullyQualifiedName.substring(0, sourceClassFullyQualifiedName.lastIndexOf("."));
-        return sourceClassPackage + "." + simpleClassName;
-    }
-
-    private String evaluateFromCaller(Node sourceClassNode, Node callerClassNode) {
-        Node implementor = implementor(callerClassNode);
+    private String evaluateFromCaller(Node callerClassNode) {
+        Node implementor = new Implementor(callerClassNode, methodCallNodeValue.call).get();
         if (implementor == null) {
             throw new RuntimeException("Implementor not found");
         }
@@ -59,25 +49,6 @@ public class MethodEvaluator {
             throw new RuntimeException("The instance variable '" + returnExpression + "' could not be evaluated for the node " + instanceVariableOwner);
         }
         return evaluatedInstanceVariable;
-    }
-
-    private Node implementor(Node currentNode) {
-        if (currentNode.value.equals(methodCallNodeValue.call)) {
-            Node targetNode = currentNode;
-            while (targetNode.parent.type != Node.Type.CLASS && targetNode.parent.type != Node.Type.INTERFACE) {
-                targetNode = targetNode.parent;
-            }
-            return targetNode.parent;
-        }
-
-        for (Node child : currentNode.children) {
-            Node found = implementor(child);
-            if (found != null) {
-                return found;
-            }
-        }
-
-        return null;
     }
 
     private Node instanceVariableOwner(String instanceVariableId, Node currentNode) {

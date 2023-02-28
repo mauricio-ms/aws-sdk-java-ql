@@ -116,9 +116,8 @@ public class Main {
                 });
 
         projectTree.walk(TreeListenableFactory.project(projectTree), Node.Type.LIB);
-        clientTree.walk(TreeListenableFactory.client(clientTree, projectTree), Node.Type.LIB);
 
-        projectTree.walk(new TreeListenerDependencies(), Node.Type.LIB);
+        projectTree.walk(TreeListenableFactory.dependencies(clientTree, projectTree), Node.Type.LIB);
 
         StdOut.println("Graph");
         ServicesGraph.show();
@@ -126,7 +125,7 @@ public class Main {
     }
 
     private static List<Project> readProjects() throws IOException {
-        try (Stream<Path> paths = Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced_4"))) {
+        try (Stream<Path> paths = Files.list(Path.of("/home/mauricio/development/aws-sdk-java-ql/beatstars/reduced_3"))) {
             return paths
                     .map(path -> new Project(path.toString()))
                     .toList();
